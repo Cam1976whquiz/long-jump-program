@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Long Jump Strength Program</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏃</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ============ Supabase: see the SUPABASE CONFIG block in the script at the bottom ============ */
+:root {
+  --paper: #F5F7FA;
+  --surface: #FFFFFF;
+  --ink: #15202B;
+  --muted: #566372;
+  --line: #D6DCE3;
+  --track: #2457A6;
+  --track-ink: #FFFFFF;
+  --sand: #D9BF86;
+  --sand-ink: #3D2F12;
+  --ok: #1D7A46;
+  --bad: #B3261E;
+  --head: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "Source Sans 3", "Segoe UI", system-ui, -apple-system, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0E151D;
+    --surface: #16202B;
+    --ink: #E7EDF3;
+    --muted: #9AA8B6;
+    --line: #2A3745;
+    --track: #2F64B5;
+    --sand: #CDB277;
+    --sand-ink: #2B210C;
+    --ok: #5CC48A;
+    --bad: #F08A84;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 64px); }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 17px/1.55 var(--body);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+a { color: var(--track); }
+@media (prefers-color-scheme: dark) { a { color: #8DB4F0; } }
+:focus-visible { outline: 3px solid var(--sand); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--head); line-height: 1.05; margin: 0; }
+h2 { font-size: clamp(2rem, 6vw, 2.75rem); letter-spacing: .01em; }
+h3 { font-size: 1.45rem; margin: 2rem 0 .6rem; }
+p { margin: 0 0 1rem; max-width: 66ch; }
+
+/* Hero: the runway */
+.hero {
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 46px, rgba(255,255,255,.55) 46px 48px),
+    var(--track);
+  color: var(--track-ink);
+  padding: calc(env(safe-area-inset-top, 0px) + 3rem) 1.25rem 2.25rem;
+}
+.wrap { max-width: 980px; margin: 0 auto; }
+.hero h1 { font-size: clamp(3rem, 12vw, 6.5rem); letter-spacing: -.01em; }
+.hero p { font-size: 1.15rem; margin: .75rem 0 2rem; max-width: 40ch; }
+.runway { display: flex; align-items: stretch; height: 64px; gap: 4px; }
+.runway a {
+  color: var(--track-ink); text-decoration: none; background: rgba(255,255,255,.14);
+  border: 2px solid rgba(255,255,255,.8); display: flex; flex-direction: column; justify-content: center;
+  padding: 0 .75rem; font-family: var(--head); font-size: 1.15rem; line-height: 1.1; min-width: 0;
+}
+.runway a span { font-family: var(--body); font-size: .8rem; opacity: .9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.runway a:hover { background: rgba(255,255,255,.26); }
+.runway .p1 { flex: 4; } .runway .p2 { flex: 4; } .runway .season { flex: 5; }
+.runway .board { width: 10px; background: #fff; flex: none; }
+.runway .pit { flex: 2; background: var(--sand); border-radius: 0 32px 32px 0; }
+
+/* Nav */
+nav {
+  position: sticky; top: 0; z-index: 5; background: var(--surface);
+  border-bottom: 1px solid var(--line); padding-top: env(safe-area-inset-top, 0px);
+}
+nav .wrap { display: flex; gap: .25rem; overflow-x: auto; padding: .4rem 1rem; scrollbar-width: none; }
+nav a {
+  white-space: nowrap; text-decoration: none; color: var(--ink); font-weight: 600;
+  padding: .45rem .8rem; border-radius: 6px; font-size: .95rem;
+}
+nav a:hover { background: var(--paper); }
+
+main section { padding: 3rem 1.25rem 1rem; }
+main section + section { border-top: 1px solid var(--line); }
+.lead { font-size: 1.12rem; }
+
+/* Tables */
+.scroll { overflow-x: auto; margin: 0 0 1.25rem; }
+table { border-collapse: collapse; width: 100%; min-width: 420px; background: var(--surface); }
+th, td { text-align: left; padding: .6rem .75rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; color: var(--muted); font-size: .9rem; }
+
+/* Workout lists */
+.day { background: var(--surface); border: 1px solid var(--line); border-left: 6px solid var(--track); margin: 0 0 1.25rem; }
+.day h3 { margin: 0; padding: .9rem 1rem .5rem; }
+.ex { display: grid; grid-template-columns: 1fr auto; gap: .15rem 1rem; padding: .75rem 1rem; border-top: 1px solid var(--line); }
+.ex-name { font-weight: 600; }
+.ex-sr { font-family: var(--head); font-size: 1.3rem; text-align: right; white-space: nowrap; }
+.ex-notes { color: var(--muted); font-size: .95rem; grid-column: 1 / -1; }
+.ex-video { grid-column: 1 / -1; font-size: .95rem; font-weight: 600; }
+.ex-video a { display: inline-block; padding: .2rem 0; }
+
+.callout { background: var(--surface); border: 1px solid var(--line); padding: 1rem 1.1rem; margin: 0 0 1.25rem; max-width: 70ch; }
+ul { padding-left: 1.2rem; max-width: 66ch; } li { margin: .3rem 0; }
+
+/* Lift log */
+#log[hidden] { display: none; }
+form { display: grid; gap: .9rem; max-width: 520px; background: var(--surface); border: 1px solid var(--line); padding: 1.25rem; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
+label { display: grid; gap: .3rem; font-weight: 600; font-size: .95rem; }
+input, select {
+  font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--line);
+  border-radius: 6px; padding: .6rem .7rem; width: 100%;
+}
+button {
+  font: 700 1.25rem var(--head); letter-spacing: .02em; background: var(--track); color: #fff;
+  border: 0; border-radius: 6px; padding: .75rem 1rem; cursor: pointer;
+}
+button:disabled { opacity: .6; cursor: wait; }
+#status { min-height: 1.5em; margin: 0; font-weight: 600; }
+#status.ok { color: var(--ok); } #status.bad { color: var(--bad); }
+footer { padding: 2rem 1.25rem 3rem; color: var(--muted); font-size: .9rem; }
+
+@media (max-width: 560px) {
+  .runway a span { display: none; }
+  .runway a { font-size: 1rem; padding: 0 .45rem; }
+  .row2 { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>Long Jump Strength Program</h1>
+    <p>Eight weeks of offseason lifting, then two short lifts a week around Friday meets.</p>
+    <div class="runway" aria-label="Program phases">
+      <a class="p1" href="#phase1">Weeks 1–4<span>Build the base</span></a>
+      <a class="p2" href="#phase2">Weeks 5–8<span>Strength to power</span></a>
+      <a class="season" href="#inseason">Season<span>Friday meets</span></a>
+      <div class="board" aria-hidden="true"></div>
+      <div class="pit" aria-hidden="true"></div>
+    </div>
+  </div>
+</header>
+
+<nav aria-label="Sections">
+  <div class="wrap">
+    <a href="#start">How it works</a>
+    <a href="#phase1">Weeks 1–4</a>
+    <a href="#phase2">Weeks 5–8</a>
+    <a href="#plyos">Plyos & sprints</a>
+    <a href="#inseason">In season</a>
+    <a href="#testing">Testing & safety</a>
+    <a href="#log" id="nav-log" hidden>Log a lift</a>
+  </div>
+</nav>
+
+<main>
+<section id="start"><div class="wrap">
+  <h2>How it works</h2>
+  <p class="lead">Lift Monday, Wednesday and Friday for 8 weeks. Weeks 1–4 build strength; weeks 5–8 turn it into speed and pop off the board. Once meets start, drop to two short lifts a week.</p>
+  <p>Do plyos and sprints at the start of practice, before you lift, while you're fresh.</p>
+  <div class="callout">
+    <p><strong>How hard to push (RPE).</strong> Effort is rated 1–10. RPE 7 means you could have done about 3 more good reps. RPE 8 means about 2 more. Nobody grinds to failure.</p>
+    <p style="margin:0"><strong>Warm up every time (10 minutes):</strong> light jog or skips, leg swings, walking lunges with a reach, glute bridges, A-skips, then 2 light sets of your first lift.</p>
+  </div>
+</div></section>
+
+<section id="phase1"><div class="wrap">
+  <h2>Weeks 1–4: Build the base</h2>
+  <p class="lead">Moderate weights, more reps. Learn the lifts and build muscle, tendons and work capacity.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Week</th><th>Effort</th><th>What to do</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>RPE 6</td><td>Learn the lifts, find starting weights</td></tr>
+      <tr><td>2</td><td>RPE 7</td><td>Add weight if every rep looked clean</td></tr>
+      <tr><td>3</td><td>RPE 7–8</td><td>Heaviest week of the phase</td></tr>
+      <tr><td>4</td><td>RPE 6, one less set per lift</td><td>Lighter week and testing</td></tr>
+    </tbody>
+  </table></div>
+  <div data-section="phase1"></div>
+  <p>Rest 2 minutes on the first two lifts of each day and 60–90 seconds on the rest.</p>
+</div></section>
+
+<section id="phase2"><div class="wrap">
+  <h2>Weeks 5–8: Strength to power</h2>
+  <p class="lead">Heavier, fewer reps, plus explosive lifts. Week 8 backs off so you start the season fresh.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Week</th><th>Main lifts</th><th>Effort</th></tr></thead>
+    <tbody>
+      <tr><td>5</td><td>4 × 5</td><td>RPE 7 (about 75%)</td></tr>
+      <tr><td>6</td><td>4 × 4</td><td>RPE 8 (about 80%)</td></tr>
+      <tr><td>7</td><td>4 × 3</td><td>RPE 8 (about 85%)</td></tr>
+      <tr><td>8</td><td>3 × 3</td><td>RPE 7 (about 75%), lighter week and retest</td></tr>
+    </tbody>
+  </table></div>
+  <p>“Main-lift scheme” means use the sets and reps for that week from this table. Keep explosive lifts at 3 reps or fewer and stop the set if the bar slows down.</p>
+  <div data-section="phase2"></div>
+</div></section>
+
+<section id="plyos"><div class="wrap">
+  <h2>Plyos & sprints</h2>
+  <p class="lead">2–3 days a week, right after the warm-up and before lifting. Rest fully between reps. A “contact” is every time a foot hits the ground.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Weeks</th><th>Contacts per session</th><th>Plyos</th><th>Sprints</th></tr></thead>
+    <tbody>
+      <tr><td>1–2</td><td>40–60</td><td>Pogo hops, snap-downs, broad jump (stick the landing), skips for height</td><td>4–6 × 20 m starts</td></tr>
+      <tr><td>3–4</td><td>60–80</td><td>Add alternate-leg bounds, low hurdle hops, lateral bounds</td><td>6 × 20 m + 3 × 30 m</td></tr>
+      <tr><td>5–6</td><td>80–100</td><td>Add single-leg bounds, two-foot to one-foot hops, short-approach pop-ups</td><td>4 × 30 m + 3 × 20 m flying</td></tr>
+      <tr><td>7–8</td><td>60–80</td><td>Fewer reps, max effort: bounds for distance, 4–6 step pop-ups</td><td>3 × 30 m + 3 × 20 m flying</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li>Jump on grass, turf or the runway, never concrete.</li>
+    <li>Stop the set when landings get loud or sloppy.</li>
+    <li>On a big jumping day, skip box jumps in the lift.</li>
+  </ul>
+</div></section>
+
+<section id="inseason"><div class="wrap">
+  <h2>In season: Friday meets</h2>
+  <p class="lead">Two short lifts a week, 30–40 minutes. Keep the weight heavy and the sets few, so legs stay fresh for Friday.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Day</th><th>Lift</th><th>Practice</th></tr></thead>
+    <tbody>
+      <tr><td>Monday</td><td>Lift 1: Strength, after practice</td><td>Short-approach jumps, starts</td></tr>
+      <tr><td>Tuesday</td><td>None</td><td>Full-approach runs, sprint work</td></tr>
+      <tr><td>Wednesday</td><td>Lift 2: Speed and upkeep (light)</td><td>Light technique, short sprints</td></tr>
+      <tr><td>Thursday</td><td>None</td><td>Approach check, a few strides</td></tr>
+      <tr><td>Friday</td><td>Meet</td><td></td></tr>
+      <tr><td>Saturday</td><td>None</td><td>Off or light mobility</td></tr>
+      <tr><td>Sunday</td><td>None</td><td>Off</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li>If your legs feel heavy Wednesday, do only the jumps and core.</li>
+    <li>No meet this week: add 1 set to each Lift 1 exercise.</li>
+    <li>Saturday invitational after a Friday meet: skip Wednesday's lift.</li>
+    <li>Championship meets: last heavy lift 7–10 days before. The final week is Lift 2 at half the sets, or no lifting.</li>
+  </ul>
+  <div data-section="inseason"></div>
+</div></section>
+
+<section id="testing"><div class="wrap">
+  <h2>Testing & safety</h2>
+  <p class="lead">Test in weeks 1, 4 and 8 so you can see the offseason paying off.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Test</th><th>How</th><th>What it shows</th></tr></thead>
+    <tbody>
+      <tr><td>Standing long jump</td><td>Best of 3, measured to the heel</td><td>Horizontal power</td></tr>
+      <tr><td>Vertical jump</td><td>Best of 3</td><td>Vertical power</td></tr>
+      <tr><td>30 m sprint (or 10 m start)</td><td>Best of 2</td><td>Approach speed</td></tr>
+      <tr><td>5-rep max squat or trap bar deadlift</td><td>Experienced lifters only</td><td>Strength</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Adding weight</h3>
+  <ul>
+    <li>Add 5–10 lb to leg lifts and 5 lb to upper-body lifts when every rep looked clean at the target effort.</li>
+    <li>If form broke down, keep the same weight next week.</li>
+    <li>First-year lifters: stay with goblet squats, trap bar and lighter variations all offseason.</li>
+  </ul>
+  <h3>Staying healthy</h3>
+  <ul>
+    <li>Technique before weight, always. Use a spotter on every squat and bench set.</li>
+    <li>Tell your coach about pain below the kneecap, in the shins, or in the heel or Achilles. Jumping volume gets cut first.</li>
+    <li>Sleep and eat enough. Tired, underfed athletes don't get stronger.</li>
+    <li>Pain that changes how you move means stop and see the athletic trainer.</li>
+  </ul>
+</div></section>
+
+<section id="log" hidden><div class="wrap">
+  <h2>Log a lift</h2>
+  <p class="lead">Save what you lifted so your coach can track progress. Only your coach can see entries.</p>
+  <form id="log-form" novalidate>
+    <div class="row2">
+      <label>Your initials<input name="initials" maxlength="4" autocomplete="off" required></label>
+      <label>Date<input name="lift_date" type="date" required></label>
+    </div>
+    <label>Exercise<select name="exercise" required></select></label>
+    <div class="row2">
+      <label>Weight (lb)<input name="weight_lb" type="number" inputmode="decimal" min="0" max="1000" step="2.5"></label>
+      <label>Reps<input name="reps" type="number" inputmode="numeric" min="1" max="50" required></label>
+    </div>
+    <label>Team code<input name="team_code" autocomplete="off" required></label>
+    <button type="submit">Save lift</button>
+    <p id="status" role="status" aria-live="polite"></p>
+  </form>
+</div></section>
+</main>
+
+<footer><div class="wrap">Watch each demo video before your first set of a new lift. Questions about any lift go to your coach.</div></footer>
+
+<script>
+// ===================== SUPABASE CONFIG =====================
+// Leave both empty to run as a plain static site (works on Vercel as-is).
+// To connect Supabase: click Connect at the top of your Supabase project and copy the
+// Project URL and the publishable key (starts with sb_publishable_). Paste them here,
+// then commit. The publishable key is safe in a web page; row level security in
+// supabase-setup.sql controls what visitors can do. NEVER paste a secret key (sb_secret_).
+const SUPABASE_URL = "https://iezgnjhpegstffzqvksd.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_1rbCqEK3ZUqDQIITF5ppAg_rFdS9PLt";
+// ===========================================================
+
+// Built-in workouts, used when Supabase isn't connected or can't be reached.
+const STATIC_EXERCISES = [
+ {
+  "section": "phase1",
+  "day": "Day A: Lower-body strength (Monday)",
+  "sort_order": 10,
+  "exercise": "Goblet squat (new lifters) or back squat",
+  "sets_reps": "3 × 8",
+  "notes": "Full depth, chest up",
+  "video_url": "https://www.youtube.com/watch?v=nfX7IFK9UNI"
+ },
+ {
+  "section": "phase1",
+  "day": "Day A: Lower-body strength (Monday)",
+  "sort_order": 20,
+  "exercise": "Romanian deadlift (RDL)",
+  "sets_reps": "3 × 8",
+  "notes": "Hinge at the hips, soft knees",
+  "video_url": "https://www.youtube.com/watch?v=7j-2w4-P14I"
+ },
+ {
+  "section": "phase1",
+  "day": "Day A: Lower-body strength (Monday)",
+  "sort_order": 30,
+  "exercise": "Rear-foot elevated split squat",
+  "sets_reps": "3 × 8 each leg",
+  "notes": "Start with the takeoff leg",
+  "video_url": "https://www.youtube.com/watch?v=3fxmRoIE_fk"
+ },
+ {
+  "section": "phase1",
+  "day": "Day A: Lower-body strength (Monday)",
+  "sort_order": 40,
+  "exercise": "Standing calf raise",
+  "sets_reps": "3 × 12",
+  "notes": "2-second pause at the top",
+  "video_url": "https://www.youtube.com/watch?v=_hIgqJ0wNao"
+ },
+ {
+  "section": "phase1",
+  "day": "Day A: Lower-body strength (Monday)",
+  "sort_order": 50,
+  "exercise": "Side plank",
+  "sets_reps": "3 × 30 sec each side",
+  "notes": "",
+  "video_url": null
+ },
+ {
+  "section": "phase1",
+  "day": "Day B: Upper body, single leg, hamstrings (Wednesday)",
+  "sort_order": 60,
+  "exercise": "Push-up or bench press",
+  "sets_reps": "3 × 8–10",
+  "notes": "",
+  "video_url": null
+ },
+ {
+  "section": "phase1",
+  "day": "Day B: Upper body, single leg, hamstrings (Wednesday)",
+  "sort_order": 70,
+  "exercise": "Dumbbell row",
+  "sets_reps": "3 × 10 each arm",
+  "notes": "",
+  "video_url": null
+ },
+ {
+  "section": "phase1",
+  "day": "Day B: Upper body, single leg, hamstrings (Wednesday)",
+  "sort_order": 80,
+  "exercise": "Step-up (knee-high box)",
+  "sets_reps": "3 × 8 each leg",
+  "notes": "Drive through the whole foot",
+  "video_url": "https://www.youtube.com/watch?v=1ylThQAB9UI"
+ },
+ {
+  "section": "phase1",
+  "day": "Day B: Upper body, single leg, hamstrings (Wednesday)",
+  "sort_order": 90,
+  "exercise": "Hip thrust or glute bridge",
+  "sets_reps": "3 × 10",
+  "notes": "Squeeze glutes at the top",
+  "video_url": "https://www.youtube.com/watch?v=Zp26q4BY5HE"
+ },
+ {
+  "section": "phase1",
+  "day": "Day B: Upper body, single leg, hamstrings (Wednesday)",
+  "sort_order": 100,
+  "exercise": "Nordic hamstring curl (lowering only)",
+  "sets_reps": "3 × 4",
+  "notes": "Lower slowly, push back up with your hands",
+  "video_url": "https://www.youtube.com/watch?v=Yn7aqLkeF0U"
+ },
+ {
+  "section": "phase1",
+  "day": "Day B: Upper body, single leg, hamstrings (Wednesday)",
+  "sort_order": 110,
+  "exercise": "Dead bug",
+  "sets_reps": "3 × 8 each side",
+  "notes": "",
+  "video_url": null
+ },
+ {
+  "section": "phase1",
+  "day": "Day C: Power and posterior chain (Friday)",
+  "sort_order": 120,
+  "exercise": "Med ball scoop toss (forward)",
+  "sets_reps": "3 × 5",
+  "notes": "Max intent, full rest",
+  "video_url": "https://www.youtube.com/watch?v=UmLEPjElr4s"
+ },
+ {
+  "section": "phase1",
+  "day": "Day C: Power and posterior chain (Friday)",
+  "sort_order": 130,
+  "exercise": "Kettlebell swing",
+  "sets_reps": "3 × 10",
+  "notes": "Snap the hips",
+  "video_url": "https://www.youtube.com/watch?v=GYHbu2LRqD0"
+ },
+ {
+  "section": "phase1",
+  "day": "Day C: Power and posterior chain (Friday)",
+  "sort_order": 140,
+  "exercise": "Trap bar deadlift",
+  "sets_reps": "3 × 6",
+  "notes": "Swap for RDL if there's no trap bar",
+  "video_url": "https://www.youtube.com/watch?v=dfYIApfWS5o"
+ },
+ {
+  "section": "phase1",
+  "day": "Day C: Power and posterior chain (Friday)",
+  "sort_order": 150,
+  "exercise": "Single-leg RDL",
+  "sets_reps": "3 × 8 each leg",
+  "notes": "Dumbbell in the opposite hand",
+  "video_url": "https://www.youtube.com/watch?v=3ed_5PmwLMU"
+ },
+ {
+  "section": "phase1",
+  "day": "Day C: Power and posterior chain (Friday)",
+  "sort_order": 160,
+  "exercise": "Lateral lunge",
+  "sets_reps": "2 × 8 each side",
+  "notes": "",
+  "video_url": null
+ },
+ {
+  "section": "phase1",
+  "day": "Day C: Power and posterior chain (Friday)",
+  "sort_order": 170,
+  "exercise": "Single-leg calf raise",
+  "sets_reps": "3 × 10 each leg",
+  "notes": "Bent-knee and straight-knee",
+  "video_url": "https://www.youtube.com/watch?v=_hIgqJ0wNao"
+ },
+ {
+  "section": "phase1",
+  "day": "Day C: Power and posterior chain (Friday)",
+  "sort_order": 180,
+  "exercise": "Pallof press",
+  "sets_reps": "3 × 10 each side",
+  "notes": "",
+  "video_url": "https://www.youtube.com/watch?v=GfTQ0RLZ7GA"
+ },
+ {
+  "section": "phase2",
+  "day": "Day A: Max strength (Monday)",
+  "sort_order": 190,
+  "exercise": "Hang power clean",
+  "sets_reps": "4 × 3",
+  "notes": "Fast elbows, catch in a quarter squat",
+  "video_url": "https://www.youtube.com/watch?v=efHjodEVf9w"
+ },
+ {
+  "section": "phase2",
+  "day": "Day A: Max strength (Monday)",
+  "sort_order": 200,
+  "exercise": "Back squat",
+  "sets_reps": "Main-lift scheme",
+  "notes": "See the week table",
+  "video_url": "https://www.nsca.com/education/videos/exercise-technique-high-bar-back-squat/"
+ },
+ {
+  "section": "phase2",
+  "day": "Day A: Max strength (Monday)",
+  "sort_order": 210,
+  "exercise": "Romanian deadlift (RDL)",
+  "sets_reps": "3 × 5",
+  "notes": "",
+  "video_url": "https://www.youtube.com/watch?v=7j-2w4-P14I"
+ },
+ {
+  "section": "phase2",
+  "day": "Day A: Max strength (Monday)",
+  "sort_order": 220,
+  "exercise": "Rear-foot elevated split squat",
+  "sets_reps": "3 × 5 each leg",
+  "notes": "Heavier than Phase 1",
+  "video_url": "https://www.youtube.com/watch?v=3fxmRoIE_fk"
+ },
+ {
+  "section": "phase2",
+  "day": "Day A: Max strength (Monday)",
+  "sort_order": 230,
+  "exercise": "Single-leg calf raise (weighted)",
+  "sets_reps": "3 × 8 each leg",
+  "notes": "",
+  "video_url": "https://www.youtube.com/watch?v=_hIgqJ0wNao"
+ },
+ {
+  "section": "phase2",
+  "day": "Day A: Max strength (Monday)",
+  "sort_order": 240,
+  "exercise": "Hanging knee raise",
+  "sets_reps": "3 × 10",
+  "notes": "",
+  "video_url": null
+ },
+ {
+  "section": "phase2",
+  "day": "Day B: Speed-strength and single leg (Wednesday)",
+  "sort_order": 250,
+  "exercise": "Trap bar jump",
+  "sets_reps": "4 × 3",
+  "notes": "Light: 20–30% of trap bar deadlift",
+  "video_url": "https://www.youtube.com/watch?v=I-Zm8g6kXIM"
+ },
+ {
+  "section": "phase2",
+  "day": "Day B: Speed-strength and single leg (Wednesday)",
+  "sort_order": 260,
+  "exercise": "Bench press",
+  "sets_reps": "Main-lift scheme",
+  "notes": "See the week table",
+  "video_url": null
+ },
+ {
+  "section": "phase2",
+  "day": "Day B: Speed-strength and single leg (Wednesday)",
+  "sort_order": 270,
+  "exercise": "Pull-up or lat pulldown",
+  "sets_reps": "3 × 6–8",
+  "notes": "",
+  "video_url": null
+ },
+ {
+  "section": "phase2",
+  "day": "Day B: Speed-strength and single leg (Wednesday)",
+  "sort_order": 280,
+  "exercise": "Step-up (weighted)",
+  "sets_reps": "3 × 5 each leg",
+  "notes": "Explode up, control down",
+  "video_url": "https://www.youtube.com/watch?v=1ylThQAB9UI"
+ },
+ {
+  "section": "phase2",
+  "day": "Day B: Speed-strength and single leg (Wednesday)",
+  "sort_order": 290,
+  "exercise": "Nordic hamstring curl",
+  "sets_reps": "3 × 5",
+  "notes": "",
+  "video_url": "https://www.youtube.com/watch?v=Yn7aqLkeF0U"
+ },
+ {
+  "section": "phase2",
+  "day": "Day B: Speed-strength and single leg (Wednesday)",
+  "sort_order": 300,
+  "exercise": "Pallof press",
+  "sets_reps": "3 × 10 each side",
+  "notes": "",
+  "video_url": "https://www.youtube.com/watch?v=GfTQ0RLZ7GA"
+ },
+ {
+  "section": "phase2",
+  "day": "Day C: Contrast, heavy then explosive (Friday)",
+  "sort_order": 310,
+  "exercise": "Front squat or trap bar deadlift",
+  "sets_reps": "Main-lift scheme",
+  "notes": "Pair 1: rest 30 seconds, then box jump",
+  "video_url": "https://www.youtube.com/watch?v=Q1R0_CbgHpc"
+ },
+ {
+  "section": "phase2",
+  "day": "Day C: Contrast, heavy then explosive (Friday)",
+  "sort_order": 320,
+  "exercise": "Box jump",
+  "sets_reps": "3 × 3",
+  "notes": "Pair 1: step down, don't jump down",
+  "video_url": "https://www.youtube.com/watch?v=W5QzqIbEWvk"
+ },
+ {
+  "section": "phase2",
+  "day": "Day C: Contrast, heavy then explosive (Friday)",
+  "sort_order": 330,
+  "exercise": "Single-leg RDL",
+  "sets_reps": "3 × 5 each leg",
+  "notes": "Pair 2: rest 30 seconds, then single-leg box jump",
+  "video_url": "https://www.youtube.com/watch?v=3ed_5PmwLMU"
+ },
+ {
+  "section": "phase2",
+  "day": "Day C: Contrast, heavy then explosive (Friday)",
+  "sort_order": 340,
+  "exercise": "Single-leg box jump (takeoff leg)",
+  "sets_reps": "3 × 3 each leg",
+  "notes": "Pair 2",
+  "video_url": "https://www.youtube.com/watch?v=W5QzqIbEWvk"
+ },
+ {
+  "section": "phase2",
+  "day": "Day C: Contrast, heavy then explosive (Friday)",
+  "sort_order": 350,
+  "exercise": "Med ball overhead backward toss",
+  "sets_reps": "3 × 4",
+  "notes": "",
+  "video_url": null
+ },
+ {
+  "section": "phase2",
+  "day": "Day C: Contrast, heavy then explosive (Friday)",
+  "sort_order": 360,
+  "exercise": "Copenhagen plank",
+  "sets_reps": "2 × 20 sec each side",
+  "notes": "",
+  "video_url": "https://www.youtube.com/watch?v=5cTh21BfXzI"
+ },
+ {
+  "section": "inseason",
+  "day": "Lift 1: Strength (Monday, after practice)",
+  "sort_order": 370,
+  "exercise": "Hang power clean",
+  "sets_reps": "3 × 2",
+  "notes": "Fast, crisp",
+  "video_url": "https://www.youtube.com/watch?v=efHjodEVf9w"
+ },
+ {
+  "section": "inseason",
+  "day": "Lift 1: Strength (Monday, after practice)",
+  "sort_order": 380,
+  "exercise": "Back squat or trap bar deadlift",
+  "sets_reps": "3 × 3",
+  "notes": "RPE 7–8 (about 80%)",
+  "video_url": "https://www.nsca.com/education/videos/exercise-technique-high-bar-back-squat/"
+ },
+ {
+  "section": "inseason",
+  "day": "Lift 1: Strength (Monday, after practice)",
+  "sort_order": 390,
+  "exercise": "Romanian deadlift (RDL)",
+  "sets_reps": "2 × 5",
+  "notes": "RPE 7",
+  "video_url": "https://www.youtube.com/watch?v=7j-2w4-P14I"
+ },
+ {
+  "section": "inseason",
+  "day": "Lift 1: Strength (Monday, after practice)",
+  "sort_order": 400,
+  "exercise": "Rear-foot elevated split squat",
+  "sets_reps": "2 × 5 each leg",
+  "notes": "RPE 7",
+  "video_url": "https://www.youtube.com/watch?v=3fxmRoIE_fk"
+ },
+ {
+  "section": "inseason",
+  "day": "Lift 1: Strength (Monday, after practice)",
+  "sort_order": 410,
+  "exercise": "Plank or dead bug",
+  "sets_reps": "2 sets",
+  "notes": "",
+  "video_url": null
+ },
+ {
+  "section": "inseason",
+  "day": "Lift 2: Speed and upkeep (Wednesday, light)",
+  "sort_order": 420,
+  "exercise": "Trap bar jump or box jump",
+  "sets_reps": "3 × 3",
+  "notes": "Light, max intent",
+  "video_url": "https://www.youtube.com/watch?v=I-Zm8g6kXIM"
+ },
+ {
+  "section": "inseason",
+  "day": "Lift 2: Speed and upkeep (Wednesday, light)",
+  "sort_order": 430,
+  "exercise": "Bench press or push-up",
+  "sets_reps": "3 × 5",
+  "notes": "RPE 7",
+  "video_url": null
+ },
+ {
+  "section": "inseason",
+  "day": "Lift 2: Speed and upkeep (Wednesday, light)",
+  "sort_order": 440,
+  "exercise": "Nordic hamstring curl",
+  "sets_reps": "2 × 3",
+  "notes": "",
+  "video_url": "https://www.youtube.com/watch?v=Yn7aqLkeF0U"
+ },
+ {
+  "section": "inseason",
+  "day": "Lift 2: Speed and upkeep (Wednesday, light)",
+  "sort_order": 450,
+  "exercise": "Single-leg calf raise",
+  "sets_reps": "2 × 10 each leg",
+  "notes": "",
+  "video_url": "https://www.youtube.com/watch?v=_hIgqJ0wNao"
+ },
+ {
+  "section": "inseason",
+  "day": "Lift 2: Speed and upkeep (Wednesday, light)",
+  "sort_order": 460,
+  "exercise": "Pallof press",
+  "sets_reps": "2 × 10 each side",
+  "notes": "",
+  "video_url": "https://www.youtube.com/watch?v=GfTQ0RLZ7GA"
+ }
+];
+
+function el(tag, cls, text) {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text) n.textContent = text;
+  return n;
+}
+
+function render(rows) {
+  const sorted = [...rows].sort((a, b) => a.sort_order - b.sort_order);
+  document.querySelectorAll("[data-section]").forEach(box => {
+    box.replaceChildren();
+    const days = new Map();
+    sorted.filter(r => r.section === box.dataset.section).forEach(r => {
+      if (!days.has(r.day)) days.set(r.day, []);
+      days.get(r.day).push(r);
+    });
+    days.forEach((items, day) => {
+      const card = el("div", "day");
+      card.append(el("h3", null, day));
+      items.forEach(r => {
+        const row = el("div", "ex");
+        row.append(el("div", "ex-name", r.exercise), el("div", "ex-sr", r.sets_reps));
+        if (r.notes) row.append(el("div", "ex-notes", r.notes));
+        if (r.video_url) {
+          const v = el("div", "ex-video");
+          const a = el("a", null, "Watch demo video");
+          a.href = r.video_url; a.target = "_blank"; a.rel = "noopener";
+          a.setAttribute("aria-label", "Watch demo video: " + r.exercise);
+          v.append(a); row.append(v);
+        }
+        card.append(row);
+      });
+      box.append(card);
+    });
+  });
+}
+
+function fillExerciseMenu(rows) {
+  const sel = document.querySelector("select[name=exercise]");
+  const names = [...new Set(rows.map(r => r.exercise))].sort();
+  sel.replaceChildren(new Option("Choose an exercise", ""), ...names.map(n => new Option(n, n)));
+}
+
+function loadScript(src) {
+  return new Promise((ok, fail) => {
+    const s = document.createElement("script");
+    s.src = src; s.onload = ok; s.onerror = fail;
+    document.head.append(s);
+  });
+}
+
+async function connectSupabase() {
+  if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) return;
+  try {
+    await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js");
+  } catch (e) {
+    console.warn("Couldn't load Supabase; showing the built-in workouts.", e);
+    return;
+  }
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+  const { data, error } = await db.from("exercises").select("*").order("sort_order");
+  let rows = STATIC_EXERCISES;
+  if (error) console.warn("Couldn't read exercises; showing the built-in workouts.", error);
+  else if (data && data.length) { rows = data; render(rows); }
+
+  // Turn on the lift log
+  fillExerciseMenu(rows);
+  document.getElementById("log").hidden = false;
+  document.getElementById("nav-log").hidden = false;
+  const form = document.getElementById("log-form");
+  const status = document.getElementById("status");
+  form.lift_date.valueAsDate = new Date(Date.now() - new Date().getTimezoneOffset() * 60000);
+
+  form.addEventListener("submit", async ev => {
+    ev.preventDefault();
+    status.className = ""; status.textContent = "";
+    const f = form.elements;
+    if (!f.initials.value.trim() || !f.exercise.value || !f.reps.value || !f.team_code.value.trim()) {
+      status.className = "bad";
+      status.textContent = "Fill in initials, exercise, reps and team code.";
+      return;
+    }
+    const btn = form.querySelector("button");
+    btn.disabled = true; btn.textContent = "Saving…";
+    const { error } = await db.from("lift_logs").insert({
+      initials: f.initials.value.trim().toUpperCase(),
+      lift_date: f.lift_date.value,
+      exercise: f.exercise.value,
+      weight_lb: f.weight_lb.value ? Number(f.weight_lb.value) : null,
+      reps: Number(f.reps.value),
+      team_code: f.team_code.value.trim()
+    });
+    btn.disabled = false; btn.textContent = "Save lift";
+    if (error) {
+      status.className = "bad";
+      status.textContent = "Lift not saved. Check the team code and try again.";
+      console.warn(error);
+    } else {
+      status.className = "ok";
+      status.textContent = "Lift saved.";
+      f.weight_lb.value = ""; f.reps.value = "";
+    }
+  });
+}
+
+render(STATIC_EXERCISES);
+connectSupabase();
+</script>
+</body>
+</html>
