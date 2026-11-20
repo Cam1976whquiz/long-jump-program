@@ -3,844 +3,594 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Long Jump Strength Program</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏃</text></svg>">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Jumps Lab">
+<meta name="theme-color" content="#000000">
+<title>Jumps Lab</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-/* ============ Supabase: see the SUPABASE CONFIG block in the script at the bottom ============ */
 :root {
-  --paper: #F5F7FA;
-  --surface: #FFFFFF;
-  --ink: #15202B;
-  --muted: #566372;
-  --line: #D6DCE3;
-  --track: #2457A6;
-  --track-ink: #FFFFFF;
-  --sand: #D9BF86;
-  --sand-ink: #3D2F12;
-  --ok: #1D7A46;
-  --bad: #B3261E;
-  --head: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
-  --body: "Source Sans 3", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --primary: #C8102E; --accent: #000000; --on-primary: #FFFFFF; --on-accent: #FFFFFF;
+  --paper: #F3F5F8; --surface: #FFFFFF; --ink: #16202B; --muted: #5A6675; --line: #D7DDE4;
+  --ok: #1D7A46; --bad: #B3261E;
+  --head: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
   color-scheme: light;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #0E151D;
-    --surface: #16202B;
-    --ink: #E7EDF3;
-    --muted: #9AA8B6;
-    --line: #2A3745;
-    --track: #2F64B5;
-    --sand: #CDB277;
-    --sand-ink: #2B210C;
-    --ok: #5CC48A;
-    --bad: #F08A84;
-    color-scheme: dark;
-  }
-}
-* { box-sizing: border-box; }
-html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 64px); }
-body {
-  margin: 0; background: var(--paper); color: var(--ink);
-  font: 17px/1.55 var(--body);
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
-a { color: var(--track); }
-@media (prefers-color-scheme: dark) { a { color: #8DB4F0; } }
-:focus-visible { outline: 3px solid var(--sand); outline-offset: 2px; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0E141B; --surface: #17202A; --ink: #E6ECF2; --muted: #9AA7B4; --line: #2B3846;
+    --ok: #5CC48A; --bad: #F08A84; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0E141B; --surface: #17202A; --ink: #E6ECF2; --muted: #9AA7B4; --line: #2B3846;
+  --ok: #5CC48A; --bad: #F08A84; color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.45 var(--body); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--accent); }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--accent); color: var(--on-accent); border-bottom: 4px solid var(--primary); padding: .7rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+.brand { font-family: var(--head); font-size: 1.7rem; line-height: 1; letter-spacing: .01em; }
+.brand small { display: block; font-family: var(--body); font-size: .8rem; opacity: .85; letter-spacing: 0; }
+.who { background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.5); color: var(--on-accent); border-radius: 999px; padding: .3rem .8rem; cursor: pointer; font-weight: 600; max-width: 50%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+main { max-width: 560px; margin: 0 auto; padding: 1rem 1rem 6.5rem; }
+main.wide { max-width: 980px; }
 h1, h2, h3 { font-family: var(--head); line-height: 1.05; margin: 0; }
-h2 { font-size: clamp(2rem, 6vw, 2.75rem); letter-spacing: .01em; }
-h3 { font-size: 1.45rem; margin: 2rem 0 .6rem; }
-p { margin: 0 0 1rem; max-width: 66ch; }
-
-/* Hero: the runway */
-.hero {
-  background:
-    repeating-linear-gradient(to bottom, transparent 0 46px, rgba(255,255,255,.55) 46px 48px),
-    var(--track);
-  color: var(--track-ink);
-  padding: calc(env(safe-area-inset-top, 0px) + 3rem) 1.25rem 2.25rem;
-}
-.wrap { max-width: 980px; margin: 0 auto; }
-.hero h1 { font-size: clamp(3rem, 12vw, 6.5rem); letter-spacing: -.01em; }
-.hero p { font-size: 1.15rem; margin: .75rem 0 2rem; max-width: 40ch; }
-.runway { display: flex; align-items: stretch; height: 64px; gap: 4px; }
-.runway a {
-  color: var(--track-ink); text-decoration: none; background: rgba(255,255,255,.14);
-  border: 2px solid rgba(255,255,255,.8); display: flex; flex-direction: column; justify-content: center;
-  padding: 0 .75rem; font-family: var(--head); font-size: 1.15rem; line-height: 1.1; min-width: 0;
-}
-.runway a span { font-family: var(--body); font-size: .8rem; opacity: .9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.runway a:hover { background: rgba(255,255,255,.26); }
-.runway .p1 { flex: 4; } .runway .p2 { flex: 4; } .runway .season { flex: 5; }
-.runway .board { width: 10px; background: #fff; flex: none; }
-.runway .pit { flex: 2; background: var(--sand); border-radius: 0 32px 32px 0; }
-
-/* Nav */
-nav {
-  position: sticky; top: 0; z-index: 5; background: var(--surface);
-  border-bottom: 1px solid var(--line); padding-top: env(safe-area-inset-top, 0px);
-}
-nav .wrap { display: flex; gap: .25rem; overflow-x: auto; padding: .4rem 1rem; scrollbar-width: none; }
-nav a {
-  white-space: nowrap; text-decoration: none; color: var(--ink); font-weight: 600;
-  padding: .45rem .8rem; border-radius: 6px; font-size: .95rem;
-}
-nav a:hover { background: var(--paper); }
-
-main section { padding: 3rem 1.25rem 1rem; }
-main section + section { border-top: 1px solid var(--line); }
-.lead { font-size: 1.12rem; }
-
-/* Tables */
-.scroll { overflow-x: auto; margin: 0 0 1.25rem; }
-table { border-collapse: collapse; width: 100%; min-width: 420px; background: var(--surface); }
-th, td { text-align: left; padding: .6rem .75rem; border-bottom: 1px solid var(--line); vertical-align: top; }
-th { font-weight: 600; color: var(--muted); font-size: .9rem; }
-
-/* Workout lists */
-.day { background: var(--surface); border: 1px solid var(--line); border-left: 6px solid var(--track); margin: 0 0 1.25rem; }
-.day h3 { margin: 0; padding: .9rem 1rem .5rem; }
-.ex { display: grid; grid-template-columns: 1fr auto; gap: .15rem 1rem; padding: .75rem 1rem; border-top: 1px solid var(--line); }
-.ex-name { font-weight: 600; }
-.ex-sr { font-family: var(--head); font-size: 1.3rem; text-align: right; white-space: nowrap; }
-.ex-notes { color: var(--muted); font-size: .95rem; grid-column: 1 / -1; }
-.ex-video { grid-column: 1 / -1; font-size: .95rem; font-weight: 600; }
-.ex-video a { display: inline-block; padding: .2rem 0; }
-
-.callout { background: var(--surface); border: 1px solid var(--line); padding: 1rem 1.1rem; margin: 0 0 1.25rem; max-width: 70ch; }
-ul { padding-left: 1.2rem; max-width: 66ch; } li { margin: .3rem 0; }
-
-/* Lift log */
-#log[hidden] { display: none; }
-form { display: grid; gap: .9rem; max-width: 520px; background: var(--surface); border: 1px solid var(--line); padding: 1.25rem; }
-.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
-label { display: grid; gap: .3rem; font-weight: 600; font-size: .95rem; }
-input, select {
-  font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--line);
-  border-radius: 6px; padding: .6rem .7rem; width: 100%;
-}
-button {
-  font: 700 1.25rem var(--head); letter-spacing: .02em; background: var(--track); color: #fff;
-  border: 0; border-radius: 6px; padding: .75rem 1rem; cursor: pointer;
-}
-button:disabled { opacity: .6; cursor: wait; }
-#status { min-height: 1.5em; margin: 0; font-weight: 600; }
-#status.ok { color: var(--ok); } #status.bad { color: var(--bad); }
-footer { padding: 2rem 1.25rem 3rem; color: var(--muted); font-size: .9rem; }
-
-@media (max-width: 560px) {
-  .runway a span { display: none; }
-  .runway a { font-size: 1rem; padding: 0 .45rem; }
-  .row2 { grid-template-columns: 1fr; }
-}
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+h1 { font-size: 2.2rem; } h2 { font-size: 1.55rem; margin: 1.6rem 0 .6rem; } h3 { font-size: 1.25rem; }
+p { margin: 0 0 .8rem; }
+.muted { color: var(--muted); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem; margin: 0 0 1rem; }
+.row { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; }
+.spread { justify-content: space-between; }
+.tag { display: inline-block; border-radius: 999px; padding: .1rem .6rem; font-size: .8rem; font-weight: 700; background: var(--primary); color: var(--on-primary); }
+.btn { background: var(--primary); color: var(--on-primary); border: 0; border-radius: 8px; padding: .7rem 1rem; font-weight: 700; cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn.big { width: 100%; font-family: var(--head); font-size: 1.35rem; letter-spacing: .02em; padding: .85rem; }
+.btn:disabled { opacity: .55; cursor: default; }
+.seg { display: flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.seg button { flex: 1; border: 0; background: transparent; padding: .55rem .4rem; cursor: pointer; font-weight: 600; }
+.seg button[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); }
+input, select { background: var(--paper); border: 1px solid var(--line); border-radius: 7px; padding: .5rem .6rem; width: 100%; }
+label { display: grid; gap: .25rem; font-weight: 600; font-size: .92rem; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .6rem; }
+.ex { border-top: 1px solid var(--line); padding: .9rem 0 .4rem; }
+.ex:first-of-type { border-top: 0; padding-top: .2rem; }
+.ex-head { display: flex; justify-content: space-between; gap: .5rem; align-items: baseline; }
+.ex-name { font-weight: 700; font-size: 1.05rem; }
+.demo { font-size: .88rem; font-weight: 700; color: var(--primary); text-decoration: none; white-space: nowrap; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .demo { color: color-mix(in srgb, var(--primary) 55%, white); } }
+:root[data-theme="dark"] .demo { color: color-mix(in srgb, var(--primary) 55%, white); }
+.note { color: var(--muted); font-size: .9rem; margin: .15rem 0 .4rem; }
+.set { display: grid; grid-template-columns: 2.6rem 1fr 1fr 4.6rem; gap: .45rem; align-items: center; margin: .35rem 0; }
+.set .n { font-family: var(--head); font-size: 1.15rem; color: var(--muted); }
+.set .pct { display: block; font-size: .72rem; color: var(--muted); font-family: var(--body); }
+.set input { text-align: center; padding: .45rem .3rem; }
+.set button { border: 1px solid var(--line); background: var(--surface); border-radius: 7px; padding: .45rem 0; cursor: pointer; font-weight: 700; }
+.set button.saved { background: var(--ok); border-color: var(--ok); color: #fff; }
+.plyo li { margin: .2rem 0; }
+table { border-collapse: collapse; width: 100%; background: var(--surface); font-size: .94rem; }
+th, td { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { color: var(--muted); font-weight: 600; font-size: .85rem; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; margin-bottom: 1rem; }
+.rank { font-family: var(--head); font-size: 1.2rem; color: var(--muted); width: 2.2rem; }
+.attempts { display: flex; gap: .4rem; }
+.attempts button { width: 3rem; height: 2.6rem; border-radius: 7px; border: 1px solid var(--line); background: var(--surface); font-weight: 700; cursor: pointer; font-size: 1.05rem; }
+.attempts button[data-v="O"] { background: var(--ok); color: #fff; border-color: var(--ok); }
+.attempts button[data-v="X"] { background: var(--bad); color: #fff; border-color: var(--bad); }
+details.card > summary { cursor: pointer; font-family: var(--head); font-size: 1.35rem; list-style: none; }
+details.card > summary::-webkit-details-marker { display: none; }
+details.card > summary::after { content: "+"; float: right; color: var(--muted); }
+details.card[open] > summary::after { content: "–"; }
+details.card[open] > summary { margin-bottom: .8rem; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 5.2rem); background: var(--ink); color: var(--paper); padding: .55rem 1rem; border-radius: 8px; font-weight: 600; z-index: 20; opacity: 0; pointer-events: none; transition: opacity .2s; }
+.toast.show { opacity: 1; }
+nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; background: var(--surface); border-top: 1px solid var(--line); display: flex; justify-content: center; padding-bottom: env(safe-area-inset-bottom, 0px); }
+nav.tabs .inner { display: flex; width: 100%; max-width: 560px; }
+nav.tabs button { flex: 1; border: 0; background: transparent; padding: .7rem .2rem .8rem; font-weight: 700; font-size: .88rem; cursor: pointer; color: var(--muted); border-top: 3px solid transparent; }
+nav.tabs button[aria-current="page"] { color: var(--ink); border-top-color: var(--primary); }
+.names { display: grid; gap: .4rem; max-height: 50vh; overflow: auto; margin: .6rem 0; }
+.names button { text-align: left; padding: .7rem .8rem; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; cursor: pointer; display: flex; justify-content: space-between; font-weight: 600; }
+.checked { color: var(--ok); font-weight: 700; }
+.err { color: var(--bad); font-weight: 600; min-height: 1.3em; margin: .4rem 0 0; }
+.swatch { display: grid; grid-template-columns: 1fr auto; gap: .5rem; align-items: center; }
+.swatch input[type=color] { width: 3rem; height: 2.4rem; padding: .15rem; }
+@media (max-width: 380px) { .grid3 { grid-template-columns: 1fr 1fr; } }
+@media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+</style>
+<style>
+.center { text-align: center; padding: 3rem 0 1rem; }
+.spin { color: var(--muted); }
+.coach-form { display: grid; gap: .8rem; max-width: 420px; }
+.small { font-size: .88rem; }
 </style>
 </head>
 <body>
-
-<header class="hero">
-  <div class="wrap">
-    <h1>Long Jump Strength Program</h1>
-    <p>Eight weeks of offseason lifting, then two short lifts a week around Friday meets.</p>
-    <div class="runway" aria-label="Program phases">
-      <a class="p1" href="#phase1">Weeks 1–4<span>Build the base</span></a>
-      <a class="p2" href="#phase2">Weeks 5–8<span>Strength to power</span></a>
-      <a class="season" href="#inseason">Season<span>Friday meets</span></a>
-      <div class="board" aria-hidden="true"></div>
-      <div class="pit" aria-hidden="true"></div>
-    </div>
-  </div>
+<header class="top">
+  <div class="brand" id="brand">Jumps Lab<small>Duncan Demons</small></div>
+  <button class="who" id="who" type="button" hidden></button>
 </header>
-
-<nav aria-label="Sections">
-  <div class="wrap">
-    <a href="#start">How it works</a>
-    <a href="#phase1">Weeks 1–4</a>
-    <a href="#phase2">Weeks 5–8</a>
-    <a href="#plyos">Plyos & sprints</a>
-    <a href="#inseason">In season</a>
-    <a href="#testing">Testing & safety</a>
-    <a href="#log" id="nav-log" hidden>Log a lift</a>
-  </div>
-</nav>
-
-<main>
-<section id="start"><div class="wrap">
-  <h2>How it works</h2>
-  <p class="lead">Lift Monday, Wednesday and Friday for 8 weeks. Weeks 1–4 build strength; weeks 5–8 turn it into speed and pop off the board. Once meets start, drop to two short lifts a week.</p>
-  <p>Do plyos and sprints at the start of practice, before you lift, while you're fresh.</p>
-  <div class="callout">
-    <p><strong>How hard to push (RPE).</strong> Effort is rated 1–10. RPE 7 means you could have done about 3 more good reps. RPE 8 means about 2 more. Nobody grinds to failure.</p>
-    <p style="margin:0"><strong>Warm up every time (10 minutes):</strong> light jog or skips, leg swings, walking lunges with a reach, glute bridges, A-skips, then 2 light sets of your first lift.</p>
-  </div>
-</div></section>
-
-<section id="phase1"><div class="wrap">
-  <h2>Weeks 1–4: Build the base</h2>
-  <p class="lead">Moderate weights, more reps. Learn the lifts and build muscle, tendons and work capacity.</p>
-  <div class="scroll"><table>
-    <thead><tr><th>Week</th><th>Effort</th><th>What to do</th></tr></thead>
-    <tbody>
-      <tr><td>1</td><td>RPE 6</td><td>Learn the lifts, find starting weights</td></tr>
-      <tr><td>2</td><td>RPE 7</td><td>Add weight if every rep looked clean</td></tr>
-      <tr><td>3</td><td>RPE 7–8</td><td>Heaviest week of the phase</td></tr>
-      <tr><td>4</td><td>RPE 6, one less set per lift</td><td>Lighter week and testing</td></tr>
-    </tbody>
-  </table></div>
-  <div data-section="phase1"></div>
-  <p>Rest 2 minutes on the first two lifts of each day and 60–90 seconds on the rest.</p>
-</div></section>
-
-<section id="phase2"><div class="wrap">
-  <h2>Weeks 5–8: Strength to power</h2>
-  <p class="lead">Heavier, fewer reps, plus explosive lifts. Week 8 backs off so you start the season fresh.</p>
-  <div class="scroll"><table>
-    <thead><tr><th>Week</th><th>Main lifts</th><th>Effort</th></tr></thead>
-    <tbody>
-      <tr><td>5</td><td>4 × 5</td><td>RPE 7 (about 75%)</td></tr>
-      <tr><td>6</td><td>4 × 4</td><td>RPE 8 (about 80%)</td></tr>
-      <tr><td>7</td><td>4 × 3</td><td>RPE 8 (about 85%)</td></tr>
-      <tr><td>8</td><td>3 × 3</td><td>RPE 7 (about 75%), lighter week and retest</td></tr>
-    </tbody>
-  </table></div>
-  <p>“Main-lift scheme” means use the sets and reps for that week from this table. Keep explosive lifts at 3 reps or fewer and stop the set if the bar slows down.</p>
-  <div data-section="phase2"></div>
-</div></section>
-
-<section id="plyos"><div class="wrap">
-  <h2>Plyos & sprints</h2>
-  <p class="lead">2–3 days a week, right after the warm-up and before lifting. Rest fully between reps. A “contact” is every time a foot hits the ground.</p>
-  <div class="scroll"><table>
-    <thead><tr><th>Weeks</th><th>Contacts per session</th><th>Plyos</th><th>Sprints</th></tr></thead>
-    <tbody>
-      <tr><td>1–2</td><td>40–60</td><td>Pogo hops, snap-downs, broad jump (stick the landing), skips for height</td><td>4–6 × 20 m starts</td></tr>
-      <tr><td>3–4</td><td>60–80</td><td>Add alternate-leg bounds, low hurdle hops, lateral bounds</td><td>6 × 20 m + 3 × 30 m</td></tr>
-      <tr><td>5–6</td><td>80–100</td><td>Add single-leg bounds, two-foot to one-foot hops, short-approach pop-ups</td><td>4 × 30 m + 3 × 20 m flying</td></tr>
-      <tr><td>7–8</td><td>60–80</td><td>Fewer reps, max effort: bounds for distance, 4–6 step pop-ups</td><td>3 × 30 m + 3 × 20 m flying</td></tr>
-    </tbody>
-  </table></div>
-  <ul>
-    <li>Jump on grass, turf or the runway, never concrete.</li>
-    <li>Stop the set when landings get loud or sloppy.</li>
-    <li>On a big jumping day, skip box jumps in the lift.</li>
-  </ul>
-</div></section>
-
-<section id="inseason"><div class="wrap">
-  <h2>In season: Friday meets</h2>
-  <p class="lead">Two short lifts a week, 30–40 minutes. Keep the weight heavy and the sets few, so legs stay fresh for Friday.</p>
-  <div class="scroll"><table>
-    <thead><tr><th>Day</th><th>Lift</th><th>Practice</th></tr></thead>
-    <tbody>
-      <tr><td>Monday</td><td>Lift 1: Strength, after practice</td><td>Short-approach jumps, starts</td></tr>
-      <tr><td>Tuesday</td><td>None</td><td>Full-approach runs, sprint work</td></tr>
-      <tr><td>Wednesday</td><td>Lift 2: Speed and upkeep (light)</td><td>Light technique, short sprints</td></tr>
-      <tr><td>Thursday</td><td>None</td><td>Approach check, a few strides</td></tr>
-      <tr><td>Friday</td><td>Meet</td><td></td></tr>
-      <tr><td>Saturday</td><td>None</td><td>Off or light mobility</td></tr>
-      <tr><td>Sunday</td><td>None</td><td>Off</td></tr>
-    </tbody>
-  </table></div>
-  <ul>
-    <li>If your legs feel heavy Wednesday, do only the jumps and core.</li>
-    <li>No meet this week: add 1 set to each Lift 1 exercise.</li>
-    <li>Saturday invitational after a Friday meet: skip Wednesday's lift.</li>
-    <li>Championship meets: last heavy lift 7–10 days before. The final week is Lift 2 at half the sets, or no lifting.</li>
-  </ul>
-  <div data-section="inseason"></div>
-</div></section>
-
-<section id="testing"><div class="wrap">
-  <h2>Testing & safety</h2>
-  <p class="lead">Test in weeks 1, 4 and 8 so you can see the offseason paying off.</p>
-  <div class="scroll"><table>
-    <thead><tr><th>Test</th><th>How</th><th>What it shows</th></tr></thead>
-    <tbody>
-      <tr><td>Standing long jump</td><td>Best of 3, measured to the heel</td><td>Horizontal power</td></tr>
-      <tr><td>Vertical jump</td><td>Best of 3</td><td>Vertical power</td></tr>
-      <tr><td>30 m sprint (or 10 m start)</td><td>Best of 2</td><td>Approach speed</td></tr>
-      <tr><td>5-rep max squat or trap bar deadlift</td><td>Experienced lifters only</td><td>Strength</td></tr>
-    </tbody>
-  </table></div>
-  <h3>Adding weight</h3>
-  <ul>
-    <li>Add 5–10 lb to leg lifts and 5 lb to upper-body lifts when every rep looked clean at the target effort.</li>
-    <li>If form broke down, keep the same weight next week.</li>
-    <li>First-year lifters: stay with goblet squats, trap bar and lighter variations all offseason.</li>
-  </ul>
-  <h3>Staying healthy</h3>
-  <ul>
-    <li>Technique before weight, always. Use a spotter on every squat and bench set.</li>
-    <li>Tell your coach about pain below the kneecap, in the shins, or in the heel or Achilles. Jumping volume gets cut first.</li>
-    <li>Sleep and eat enough. Tired, underfed athletes don't get stronger.</li>
-    <li>Pain that changes how you move means stop and see the athletic trainer.</li>
-  </ul>
-</div></section>
-
-<section id="log" hidden><div class="wrap">
-  <h2>Log a lift</h2>
-  <p class="lead">Save what you lifted so your coach can track progress. Only your coach can see entries.</p>
-  <form id="log-form" novalidate>
-    <div class="row2">
-      <label>Your initials<input name="initials" maxlength="4" autocomplete="off" required></label>
-      <label>Date<input name="lift_date" type="date" required></label>
-    </div>
-    <label>Exercise<select name="exercise" required></select></label>
-    <div class="row2">
-      <label>Weight (lb)<input name="weight_lb" type="number" inputmode="decimal" min="0" max="1000" step="2.5"></label>
-      <label>Reps<input name="reps" type="number" inputmode="numeric" min="1" max="50" required></label>
-    </div>
-    <label>Team code<input name="team_code" autocomplete="off" required></label>
-    <button type="submit">Save lift</button>
-    <p id="status" role="status" aria-live="polite"></p>
-  </form>
-</div></section>
-</main>
-
-<footer><div class="wrap">Watch each demo video before your first set of a new lift. Questions about any lift go to your coach.</div></footer>
+<main id="view"><p class="center spin">Loading…</p></main>
+<nav class="tabs" aria-label="App sections"><div class="inner" id="tabs"></div></nav>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 // ===================== SUPABASE CONFIG =====================
-// Leave both empty to run as a plain static site (works on Vercel as-is).
-// To connect Supabase: click Connect at the top of your Supabase project and copy the
-// Project URL and the publishable key (starts with sb_publishable_). Paste them here,
-// then commit. The publishable key is safe in a web page; row level security in
-// supabase-setup.sql controls what visitors can do. NEVER paste a secret key (sb_secret_).
+// Same two values you used in index.html: Supabase > Connect > Project URL and
+// the publishable key (starts with sb_publishable_). NEVER a secret key (sb_secret_).
 const SUPABASE_URL = "https://iezgnjhpegstffzqvksd.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_1rbCqEK3ZUqDQIITF5ppAg_rFdS9PLt";
 // ===========================================================
 
-// Built-in workouts, used when Supabase isn't connected or can't be reached.
-const STATIC_EXERCISES = [
- {
-  "section": "phase1",
-  "day": "Day A: Lower-body strength (Monday)",
-  "sort_order": 10,
-  "exercise": "Goblet squat (new lifters) or back squat",
-  "sets_reps": "3 × 8",
-  "notes": "Full depth, chest up",
-  "video_url": "https://www.youtube.com/watch?v=nfX7IFK9UNI"
- },
- {
-  "section": "phase1",
-  "day": "Day A: Lower-body strength (Monday)",
-  "sort_order": 20,
-  "exercise": "Romanian deadlift (RDL)",
-  "sets_reps": "3 × 8",
-  "notes": "Hinge at the hips, soft knees",
-  "video_url": "https://www.youtube.com/watch?v=7j-2w4-P14I"
- },
- {
-  "section": "phase1",
-  "day": "Day A: Lower-body strength (Monday)",
-  "sort_order": 30,
-  "exercise": "Rear-foot elevated split squat",
-  "sets_reps": "3 × 8 each leg",
-  "notes": "Start with the takeoff leg",
-  "video_url": "https://www.youtube.com/watch?v=3fxmRoIE_fk"
- },
- {
-  "section": "phase1",
-  "day": "Day A: Lower-body strength (Monday)",
-  "sort_order": 40,
-  "exercise": "Standing calf raise",
-  "sets_reps": "3 × 12",
-  "notes": "2-second pause at the top",
-  "video_url": "https://www.youtube.com/watch?v=_hIgqJ0wNao"
- },
- {
-  "section": "phase1",
-  "day": "Day A: Lower-body strength (Monday)",
-  "sort_order": 50,
-  "exercise": "Side plank",
-  "sets_reps": "3 × 30 sec each side",
-  "notes": "",
-  "video_url": null
- },
- {
-  "section": "phase1",
-  "day": "Day B: Upper body, single leg, hamstrings (Wednesday)",
-  "sort_order": 60,
-  "exercise": "Push-up or bench press",
-  "sets_reps": "3 × 8–10",
-  "notes": "",
-  "video_url": null
- },
- {
-  "section": "phase1",
-  "day": "Day B: Upper body, single leg, hamstrings (Wednesday)",
-  "sort_order": 70,
-  "exercise": "Dumbbell row",
-  "sets_reps": "3 × 10 each arm",
-  "notes": "",
-  "video_url": null
- },
- {
-  "section": "phase1",
-  "day": "Day B: Upper body, single leg, hamstrings (Wednesday)",
-  "sort_order": 80,
-  "exercise": "Step-up (knee-high box)",
-  "sets_reps": "3 × 8 each leg",
-  "notes": "Drive through the whole foot",
-  "video_url": "https://www.youtube.com/watch?v=1ylThQAB9UI"
- },
- {
-  "section": "phase1",
-  "day": "Day B: Upper body, single leg, hamstrings (Wednesday)",
-  "sort_order": 90,
-  "exercise": "Hip thrust or glute bridge",
-  "sets_reps": "3 × 10",
-  "notes": "Squeeze glutes at the top",
-  "video_url": "https://www.youtube.com/watch?v=Zp26q4BY5HE"
- },
- {
-  "section": "phase1",
-  "day": "Day B: Upper body, single leg, hamstrings (Wednesday)",
-  "sort_order": 100,
-  "exercise": "Nordic hamstring curl (lowering only)",
-  "sets_reps": "3 × 4",
-  "notes": "Lower slowly, push back up with your hands",
-  "video_url": "https://www.youtube.com/watch?v=Yn7aqLkeF0U"
- },
- {
-  "section": "phase1",
-  "day": "Day B: Upper body, single leg, hamstrings (Wednesday)",
-  "sort_order": 110,
-  "exercise": "Dead bug",
-  "sets_reps": "3 × 8 each side",
-  "notes": "",
-  "video_url": null
- },
- {
-  "section": "phase1",
-  "day": "Day C: Power and posterior chain (Friday)",
-  "sort_order": 120,
-  "exercise": "Med ball scoop toss (forward)",
-  "sets_reps": "3 × 5",
-  "notes": "Max intent, full rest",
-  "video_url": "https://www.youtube.com/watch?v=UmLEPjElr4s"
- },
- {
-  "section": "phase1",
-  "day": "Day C: Power and posterior chain (Friday)",
-  "sort_order": 130,
-  "exercise": "Kettlebell swing",
-  "sets_reps": "3 × 10",
-  "notes": "Snap the hips",
-  "video_url": "https://www.youtube.com/watch?v=GYHbu2LRqD0"
- },
- {
-  "section": "phase1",
-  "day": "Day C: Power and posterior chain (Friday)",
-  "sort_order": 140,
-  "exercise": "Trap bar deadlift",
-  "sets_reps": "3 × 6",
-  "notes": "Swap for RDL if there's no trap bar",
-  "video_url": "https://www.youtube.com/watch?v=dfYIApfWS5o"
- },
- {
-  "section": "phase1",
-  "day": "Day C: Power and posterior chain (Friday)",
-  "sort_order": 150,
-  "exercise": "Single-leg RDL",
-  "sets_reps": "3 × 8 each leg",
-  "notes": "Dumbbell in the opposite hand",
-  "video_url": "https://www.youtube.com/watch?v=3ed_5PmwLMU"
- },
- {
-  "section": "phase1",
-  "day": "Day C: Power and posterior chain (Friday)",
-  "sort_order": 160,
-  "exercise": "Lateral lunge",
-  "sets_reps": "2 × 8 each side",
-  "notes": "",
-  "video_url": null
- },
- {
-  "section": "phase1",
-  "day": "Day C: Power and posterior chain (Friday)",
-  "sort_order": 170,
-  "exercise": "Single-leg calf raise",
-  "sets_reps": "3 × 10 each leg",
-  "notes": "Bent-knee and straight-knee",
-  "video_url": "https://www.youtube.com/watch?v=_hIgqJ0wNao"
- },
- {
-  "section": "phase1",
-  "day": "Day C: Power and posterior chain (Friday)",
-  "sort_order": 180,
-  "exercise": "Pallof press",
-  "sets_reps": "3 × 10 each side",
-  "notes": "",
-  "video_url": "https://www.youtube.com/watch?v=GfTQ0RLZ7GA"
- },
- {
-  "section": "phase2",
-  "day": "Day A: Max strength (Monday)",
-  "sort_order": 190,
-  "exercise": "Hang power clean",
-  "sets_reps": "4 × 3",
-  "notes": "Fast elbows, catch in a quarter squat",
-  "video_url": "https://www.youtube.com/watch?v=efHjodEVf9w"
- },
- {
-  "section": "phase2",
-  "day": "Day A: Max strength (Monday)",
-  "sort_order": 200,
-  "exercise": "Back squat",
-  "sets_reps": "Main-lift scheme",
-  "notes": "See the week table",
-  "video_url": "https://www.nsca.com/education/videos/exercise-technique-high-bar-back-squat/"
- },
- {
-  "section": "phase2",
-  "day": "Day A: Max strength (Monday)",
-  "sort_order": 210,
-  "exercise": "Romanian deadlift (RDL)",
-  "sets_reps": "3 × 5",
-  "notes": "",
-  "video_url": "https://www.youtube.com/watch?v=7j-2w4-P14I"
- },
- {
-  "section": "phase2",
-  "day": "Day A: Max strength (Monday)",
-  "sort_order": 220,
-  "exercise": "Rear-foot elevated split squat",
-  "sets_reps": "3 × 5 each leg",
-  "notes": "Heavier than Phase 1",
-  "video_url": "https://www.youtube.com/watch?v=3fxmRoIE_fk"
- },
- {
-  "section": "phase2",
-  "day": "Day A: Max strength (Monday)",
-  "sort_order": 230,
-  "exercise": "Single-leg calf raise (weighted)",
-  "sets_reps": "3 × 8 each leg",
-  "notes": "",
-  "video_url": "https://www.youtube.com/watch?v=_hIgqJ0wNao"
- },
- {
-  "section": "phase2",
-  "day": "Day A: Max strength (Monday)",
-  "sort_order": 240,
-  "exercise": "Hanging knee raise",
-  "sets_reps": "3 × 10",
-  "notes": "",
-  "video_url": null
- },
- {
-  "section": "phase2",
-  "day": "Day B: Speed-strength and single leg (Wednesday)",
-  "sort_order": 250,
-  "exercise": "Trap bar jump",
-  "sets_reps": "4 × 3",
-  "notes": "Light: 20–30% of trap bar deadlift",
-  "video_url": "https://www.youtube.com/watch?v=I-Zm8g6kXIM"
- },
- {
-  "section": "phase2",
-  "day": "Day B: Speed-strength and single leg (Wednesday)",
-  "sort_order": 260,
-  "exercise": "Bench press",
-  "sets_reps": "Main-lift scheme",
-  "notes": "See the week table",
-  "video_url": null
- },
- {
-  "section": "phase2",
-  "day": "Day B: Speed-strength and single leg (Wednesday)",
-  "sort_order": 270,
-  "exercise": "Pull-up or lat pulldown",
-  "sets_reps": "3 × 6–8",
-  "notes": "",
-  "video_url": null
- },
- {
-  "section": "phase2",
-  "day": "Day B: Speed-strength and single leg (Wednesday)",
-  "sort_order": 280,
-  "exercise": "Step-up (weighted)",
-  "sets_reps": "3 × 5 each leg",
-  "notes": "Explode up, control down",
-  "video_url": "https://www.youtube.com/watch?v=1ylThQAB9UI"
- },
- {
-  "section": "phase2",
-  "day": "Day B: Speed-strength and single leg (Wednesday)",
-  "sort_order": 290,
-  "exercise": "Nordic hamstring curl",
-  "sets_reps": "3 × 5",
-  "notes": "",
-  "video_url": "https://www.youtube.com/watch?v=Yn7aqLkeF0U"
- },
- {
-  "section": "phase2",
-  "day": "Day B: Speed-strength and single leg (Wednesday)",
-  "sort_order": 300,
-  "exercise": "Pallof press",
-  "sets_reps": "3 × 10 each side",
-  "notes": "",
-  "video_url": "https://www.youtube.com/watch?v=GfTQ0RLZ7GA"
- },
- {
-  "section": "phase2",
-  "day": "Day C: Contrast, heavy then explosive (Friday)",
-  "sort_order": 310,
-  "exercise": "Front squat or trap bar deadlift",
-  "sets_reps": "Main-lift scheme",
-  "notes": "Pair 1: rest 30 seconds, then box jump",
-  "video_url": "https://www.youtube.com/watch?v=Q1R0_CbgHpc"
- },
- {
-  "section": "phase2",
-  "day": "Day C: Contrast, heavy then explosive (Friday)",
-  "sort_order": 320,
-  "exercise": "Box jump",
-  "sets_reps": "3 × 3",
-  "notes": "Pair 1: step down, don't jump down",
-  "video_url": "https://www.youtube.com/watch?v=W5QzqIbEWvk"
- },
- {
-  "section": "phase2",
-  "day": "Day C: Contrast, heavy then explosive (Friday)",
-  "sort_order": 330,
-  "exercise": "Single-leg RDL",
-  "sets_reps": "3 × 5 each leg",
-  "notes": "Pair 2: rest 30 seconds, then single-leg box jump",
-  "video_url": "https://www.youtube.com/watch?v=3ed_5PmwLMU"
- },
- {
-  "section": "phase2",
-  "day": "Day C: Contrast, heavy then explosive (Friday)",
-  "sort_order": 340,
-  "exercise": "Single-leg box jump (takeoff leg)",
-  "sets_reps": "3 × 3 each leg",
-  "notes": "Pair 2",
-  "video_url": "https://www.youtube.com/watch?v=W5QzqIbEWvk"
- },
- {
-  "section": "phase2",
-  "day": "Day C: Contrast, heavy then explosive (Friday)",
-  "sort_order": 350,
-  "exercise": "Med ball overhead backward toss",
-  "sets_reps": "3 × 4",
-  "notes": "",
-  "video_url": null
- },
- {
-  "section": "phase2",
-  "day": "Day C: Contrast, heavy then explosive (Friday)",
-  "sort_order": 360,
-  "exercise": "Copenhagen plank",
-  "sets_reps": "2 × 20 sec each side",
-  "notes": "",
-  "video_url": "https://www.youtube.com/watch?v=5cTh21BfXzI"
- },
- {
-  "section": "inseason",
-  "day": "Lift 1: Strength (Monday, after practice)",
-  "sort_order": 370,
-  "exercise": "Hang power clean",
-  "sets_reps": "3 × 2",
-  "notes": "Fast, crisp",
-  "video_url": "https://www.youtube.com/watch?v=efHjodEVf9w"
- },
- {
-  "section": "inseason",
-  "day": "Lift 1: Strength (Monday, after practice)",
-  "sort_order": 380,
-  "exercise": "Back squat or trap bar deadlift",
-  "sets_reps": "3 × 3",
-  "notes": "RPE 7–8 (about 80%)",
-  "video_url": "https://www.nsca.com/education/videos/exercise-technique-high-bar-back-squat/"
- },
- {
-  "section": "inseason",
-  "day": "Lift 1: Strength (Monday, after practice)",
-  "sort_order": 390,
-  "exercise": "Romanian deadlift (RDL)",
-  "sets_reps": "2 × 5",
-  "notes": "RPE 7",
-  "video_url": "https://www.youtube.com/watch?v=7j-2w4-P14I"
- },
- {
-  "section": "inseason",
-  "day": "Lift 1: Strength (Monday, after practice)",
-  "sort_order": 400,
-  "exercise": "Rear-foot elevated split squat",
-  "sets_reps": "2 × 5 each leg",
-  "notes": "RPE 7",
-  "video_url": "https://www.youtube.com/watch?v=3fxmRoIE_fk"
- },
- {
-  "section": "inseason",
-  "day": "Lift 1: Strength (Monday, after practice)",
-  "sort_order": 410,
-  "exercise": "Plank or dead bug",
-  "sets_reps": "2 sets",
-  "notes": "",
-  "video_url": null
- },
- {
-  "section": "inseason",
-  "day": "Lift 2: Speed and upkeep (Wednesday, light)",
-  "sort_order": 420,
-  "exercise": "Trap bar jump or box jump",
-  "sets_reps": "3 × 3",
-  "notes": "Light, max intent",
-  "video_url": "https://www.youtube.com/watch?v=I-Zm8g6kXIM"
- },
- {
-  "section": "inseason",
-  "day": "Lift 2: Speed and upkeep (Wednesday, light)",
-  "sort_order": 430,
-  "exercise": "Bench press or push-up",
-  "sets_reps": "3 × 5",
-  "notes": "RPE 7",
-  "video_url": null
- },
- {
-  "section": "inseason",
-  "day": "Lift 2: Speed and upkeep (Wednesday, light)",
-  "sort_order": 440,
-  "exercise": "Nordic hamstring curl",
-  "sets_reps": "2 × 3",
-  "notes": "",
-  "video_url": "https://www.youtube.com/watch?v=Yn7aqLkeF0U"
- },
- {
-  "section": "inseason",
-  "day": "Lift 2: Speed and upkeep (Wednesday, light)",
-  "sort_order": 450,
-  "exercise": "Single-leg calf raise",
-  "sets_reps": "2 × 10 each leg",
-  "notes": "",
-  "video_url": "https://www.youtube.com/watch?v=_hIgqJ0wNao"
- },
- {
-  "section": "inseason",
-  "day": "Lift 2: Speed and upkeep (Wednesday, light)",
-  "sort_order": 460,
-  "exercise": "Pallof press",
-  "sets_reps": "2 × 10 each side",
-  "notes": "",
-  "video_url": "https://www.youtube.com/watch?v=GfTQ0RLZ7GA"
- }
-];
+const V = {
+  clean: "https://www.youtube.com/watch?v=efHjodEVf9w",
+  squat: "https://www.nsca.com/education/videos/exercise-technique-high-bar-back-squat/",
+  front: "https://www.youtube.com/watch?v=Q1R0_CbgHpc",
+  rdl: "https://www.youtube.com/watch?v=7j-2w4-P14I",
+  tbj: "https://www.youtube.com/watch?v=I-Zm8g6kXIM",
+  rfess: "https://www.youtube.com/watch?v=3fxmRoIE_fk",
+  slrdl: "https://www.youtube.com/watch?v=3ed_5PmwLMU",
+  step: "https://www.youtube.com/watch?v=1ylThQAB9UI",
+  nordic: "https://www.youtube.com/watch?v=Yn7aqLkeF0U",
+  box: "https://www.youtube.com/watch?v=W5QzqIbEWvk",
+  calf: "https://www.youtube.com/watch?v=_hIgqJ0wNao",
+  cph: "https://www.youtube.com/watch?v=5cTh21BfXzI",
+  pallof: "https://www.youtube.com/watch?v=GfTQ0RLZ7GA"
+};
+const LIFTS = { squat: "Back squat", bench: "Bench press", clean: "Hang power clean", trapbar: "Trap bar deadlift" };
+const rep = (pct, reps, n) => Array.from({ length: n }, () => [pct, reps]);
+const DAYS = {
+  A: { title: "Day A: Max strength", items: [
+    { ex: "Hang power clean", lift: "clean", sets: [[65,3],[70,3],[75,3],[75,3]], video: V.clean },
+    { ex: "Back squat", lift: "squat", sets: [[60,5],[70,4],[80,3],[80,3]], video: V.squat },
+    { ex: "Romanian deadlift", sets: rep(0,5,3), note: "Pick a weight at RPE 7 (about 3 reps left in the tank).", video: V.rdl },
+    { ex: "Rear-foot elevated split squat", sets: rep(0,5,3), note: "Dumbbells, RPE 7. Reps are each leg; start with your takeoff leg.", video: V.rfess },
+    { ex: "Single-leg calf raise", sets: rep(0,8,3), note: "Hold a dumbbell. Each leg.", video: V.calf }
+  ]},
+  B: { title: "Day B: Speed-strength", items: [
+    { ex: "Trap bar jump", lift: "trapbar", sets: rep(25,3,4), note: "Light. Jump as fast as you can.", video: V.tbj },
+    { ex: "Bench press", lift: "bench", sets: [[60,5],[70,5],[75,5],[75,5]] },
+    { ex: "Step-up", sets: rep(0,5,3), note: "Dumbbells, explode up, control down. Each leg.", video: V.step },
+    { ex: "Nordic hamstring curl", sets: rep(0,5,3), note: "Bodyweight. Lower as slowly as you can.", video: V.nordic },
+    { ex: "Pallof press", sets: rep(0,10,3), note: "Each side.", video: V.pallof }
+  ]},
+  C: { title: "Day C: Contrast", items: [
+    { ex: "Front squat", lift: "squat", sets: [[55,3],[60,3],[65,3]], note: "Weights come from your back squat max.", video: V.front },
+    { ex: "Box jump", sets: rep(0,3,3), note: "Do right after each front squat set. Step down.", video: V.box },
+    { ex: "Single-leg RDL", sets: rep(0,5,3), note: "Dumbbell in the opposite hand. Each leg.", video: V.slrdl },
+    { ex: "Copenhagen plank", sets: rep(0,20,2), unit: "sec", note: "Each side.", video: V.cph }
+  ]}
+};
+const PLYO = {
+  LJ: [["Alternate-leg bounds", "4 × 20 m"], ["Short-approach pop-ups", "6 jumps"], ["Accelerations", "4 × 20 m"]],
+  HJ: [["Scissor jumps", "6 jumps"], ["J-curve runs", "4 runs"], ["Single-leg pop-ups", "3 × 5 each leg"]],
+  Both: [["Alternate-leg bounds", "3 × 20 m"], ["J-curve runs", "3 runs"], ["Pop-ups, both events", "4 each"]]
+};
+const GROUP_NAME = { LJ: "Long Jump", HJ: "High Jump", Both: "Both" };
 
-function el(tag, cls, text) {
-  const n = document.createElement(tag);
-  if (cls) n.className = cls;
-  if (text) n.textContent = text;
-  return n;
+// ---------- helpers ----------
+const LS = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} }
+};
+function today(offset = 0) {
+  const d = new Date(); d.setDate(d.getDate() + offset);
+  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+}
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const round5 = x => Math.round(x / 5) * 5;
+function trainingMax(m) {
+  if (!m || m.method === "none" || !m.value) return null;
+  const est = m.method === "3RM" ? m.value * 1.10 : m.method === "5RM" ? m.value * (1 + 5 / 30) : m.value;
+  return round5(est * 0.90);
+}
+const ftin = inch => inch == null ? "—" : Math.floor(inch / 12) + "′ " + (Math.round((inch % 12) * 4) / 4) + "″";
+let toastTimer;
+function toast(msg) { const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 2200); }
+function onColor(hex) {
+  const n = parseInt(String(hex).slice(1), 16), c = [n >> 16, (n >> 8) & 255, n & 255].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2] > 0.35 ? "#111111" : "#FFFFFF";
+}
+function defaultDay() { const d = new Date().getDay(); return d === 3 ? "B" : d === 5 ? "C" : "A"; }
+
+// ---------- state ----------
+let db = null, isCoach = false, codeOk = false, loaded = false, loadError = "";
+let code = LS.get("jl-team-code") || "";
+let myId = LS.get("jl-me");
+let day = LS.get("jl-day") || defaultDay();
+let tab = "today";
+let board = { metric: "squat", group: "all", grade: "all" };
+let refreshedAt = null;
+const C = {
+  settings: { app_name: "Jumps Lab", school: "Duncan", mascot: "Demons", primary_color: "#C8102E", accent_color: "#000000", week: 1 },
+  roster: [], checkins: [], jumps: [], tests: [], mySets: []
+};
+const me = () => C.roster.find(a => a.id === myId);
+
+function toAthlete(r) {
+  const m = k => ({ method: r[k + "_test"] || "none", value: Number(r[k + "_lb"]) || 0 });
+  return { id: r.id, name: r.name, grade: r.grade, group: r.event_group, maxes: { squat: m("squat"), bench: m("bench"), clean: m("clean"), trapbar: m("trapbar") } };
 }
 
-function render(rows) {
-  const sorted = [...rows].sort((a, b) => a.sort_order - b.sort_order);
-  document.querySelectorAll("[data-section]").forEach(box => {
-    box.replaceChildren();
-    const days = new Map();
-    sorted.filter(r => r.section === box.dataset.section).forEach(r => {
-      if (!days.has(r.day)) days.set(r.day, []);
-      days.get(r.day).push(r);
-    });
-    days.forEach((items, day) => {
-      const card = el("div", "day");
-      card.append(el("h3", null, day));
-      items.forEach(r => {
-        const row = el("div", "ex");
-        row.append(el("div", "ex-name", r.exercise), el("div", "ex-sr", r.sets_reps));
-        if (r.notes) row.append(el("div", "ex-notes", r.notes));
-        if (r.video_url) {
-          const v = el("div", "ex-video");
-          const a = el("a", null, "Watch demo video");
-          a.href = r.video_url; a.target = "_blank"; a.rel = "noopener";
-          a.setAttribute("aria-label", "Watch demo video: " + r.exercise);
-          v.append(a); row.append(v);
-        }
-        card.append(row);
-      });
-      box.append(card);
-    });
-  });
-}
-
-function fillExerciseMenu(rows) {
-  const sel = document.querySelector("select[name=exercise]");
-  const names = [...new Set(rows.map(r => r.exercise))].sort();
-  sel.replaceChildren(new Option("Choose an exercise", ""), ...names.map(n => new Option(n, n)));
-}
-
+// ---------- Supabase ----------
 function loadScript(src) {
-  return new Promise((ok, fail) => {
-    const s = document.createElement("script");
-    s.src = src; s.onload = ok; s.onerror = fail;
-    document.head.append(s);
-  });
+  return new Promise((ok, fail) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = fail; document.head.append(s); });
+}
+function makeClient() {
+  db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, { global: { headers: { "x-team-code": code } } });
+}
+async function checkCoach() {
+  const { data: { session } } = await db.auth.getSession();
+  if (!session) return false;
+  const { data, error } = await db.rpc("jl_is_coach");
+  return !error && data === true;
+}
+async function checkCode() {
+  if (!code) return false;
+  const { data, error } = await db.rpc("jl_check_code");
+  return !error && data === true;
+}
+async function loadSettings() {
+  const { data, error } = await db.from("jl_settings").select("*").eq("id", 1).maybeSingle();
+  if (!error && data) C.settings = data;
+}
+async function refresh() {
+  if (!(codeOk || isCoach)) return;
+  const [r, ch, j, t] = await Promise.all([
+    db.from("jl_roster").select("*").eq("active", true).order("name"),
+    db.from("jl_checkins").select("athlete_id,check_date").gte("check_date", today(-6)),
+    db.from("jl_jumps").select("athlete_id,jump_date,kind,inches,attempts"),
+    db.from("jl_tests").select("athlete_id,test_date,test,value")
+  ]);
+  const err = [r, ch, j, t].find(x => x.error);
+  if (err) { loadError = "Couldn’t load team data. Check your connection and refresh."; console.warn(err.error); return; }
+  loadError = "";
+  C.roster = r.data.map(toAthlete);
+  C.checkins = ch.data; C.jumps = j.data; C.tests = t.data;
+  if (myId && !me()) { myId = null; LS.set("jl-me", null); }
+  if (myId) {
+    const s = await db.from("jl_sets").select("*").eq("athlete_id", myId).order("created_at", { ascending: false }).limit(80);
+    C.mySets = s.error ? [] : s.data;
+  } else C.mySets = [];
+  refreshedAt = new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 }
 
-async function connectSupabase() {
+// ---------- rendering ----------
+function applyTeam() {
+  const s = C.settings, r = document.documentElement.style;
+  r.setProperty("--primary", s.primary_color); r.setProperty("--accent", s.accent_color);
+  r.setProperty("--on-primary", onColor(s.primary_color)); r.setProperty("--on-accent", onColor(s.accent_color));
+  document.getElementById("brand").innerHTML = esc(s.app_name) + "<small>" + esc(s.school) + " " + esc(s.mascot) + "</small>";
+  document.title = s.app_name;
+  const meta = document.querySelector('meta[name="apple-mobile-web-app-title"]'); if (meta) meta.content = s.app_name;
+  const who = document.getElementById("who"); const a = me();
+  who.hidden = !a; if (a) { who.textContent = a.name; who.setAttribute("aria-label", "Signed in as " + a.name + ". Switch athlete"); }
+}
+const TABS = [["today", "Today"], ["jumps", "Jumps"], ["progress", "Progress"], ["board", "Board"], ["coach", "Coach"]];
+function renderTabs() {
+  document.getElementById("tabs").innerHTML = TABS.map(([k, l]) => `<button type="button" data-tab="${k}" ${k === tab ? 'aria-current="page"' : ""}>${l}</button>`).join("");
+}
+function render() {
+  applyTeam(); renderTabs();
+  const v = document.getElementById("view");
+  v.className = tab === "coach" ? "wide" : "";
+  if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) { v.innerHTML = `<h1>Almost ready</h1><p>Open <strong>index.html</strong>, find SUPABASE CONFIG, and paste your Supabase Project URL and publishable key.</p>`; return; }
+  if (!loaded) { v.innerHTML = `<p class="center spin">Loading…</p>`; return; }
+  if (tab === "coach") { v.innerHTML = isCoach ? viewCoach() : coachSignIn(); return; }
+  if (!codeOk && !isCoach) { v.innerHTML = codeScreen(); return; }
+  if (loadError) { v.innerHTML = `<h1>Can’t connect</h1><p>${loadError}</p><button class="btn" type="button" id="refresh">Try again</button>`; return; }
+  if (tab === "board") { v.innerHTML = viewBoard(); return; }
+  if (!me()) { v.innerHTML = signIn(); return; }
+  v.innerHTML = ({ today: viewToday, jumps: viewJumps, progress: viewProgress })[tab]();
+}
+function go(t) { tab = t; render(); window.scrollTo(0, 0); }
+
+function codeScreen() {
+  return `<h1>Team code</h1><p class="muted">Ask your coach for the team code. You only enter it once on this phone.</p>
+  <div class="card coach-form"><label>Team code<input id="code" autocomplete="off" autocapitalize="off" value="${esc(code)}"></label>
+  <p class="err" id="codeerr"></p><button class="btn big" type="button" id="codego">Continue</button></div>`;
+}
+function signIn() {
+  if (!C.roster.length) return `<h1>No athletes yet</h1><p class="muted">Coach: open the Coach tab, sign in, and add your roster.</p>`;
+  return `<h1>Who’s lifting?</h1>
+  <p class="muted">Pick your name once. This phone remembers you.</p>
+  <input type="search" id="find" placeholder="Search your name" aria-label="Search your name">
+  <div class="names" id="names">${namesList("")}</div>`;
+}
+function namesList(q) {
+  const list = C.roster.filter(a => a.name.toLowerCase().includes(q.toLowerCase()));
+  return list.map(a => `<button type="button" data-pick="${a.id}"><span>${esc(a.name)}</span><span class="tag">${GROUP_NAME[a.group]}</span></button>`).join("") || `<p class="muted">No name matches. Ask your coach to add you.</p>`;
+}
+
+function checkedToday(id) { return C.checkins.some(c => c.athlete_id === id && c.check_date === today()); }
+function savedSet(ex, n) { return C.mySets.find(l => l.log_date === today() && l.exercise === ex && l.set_no === n); }
+function viewToday() {
+  const a = me(); const D = DAYS[day];
+  let h = `<div class="row spread" style="margin-bottom:.4rem"><h1>Today</h1><span class="tag">${GROUP_NAME[a.group]}</span></div>
+  <p class="muted">Week ${C.settings.week} · ${new Date().toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })}</p>
+  <div class="card">${checkedToday(a.id) ? `<p class="checked" style="margin:0">Checked in for today.</p>` : `<button class="btn big" type="button" id="checkin">Check in</button>`}</div>
+  <div class="seg" role="group" aria-label="Workout day" style="margin-bottom:1rem">${Object.keys(DAYS).map(k => `<button type="button" data-day="${k}" aria-pressed="${k === day}">Day ${k}</button>`).join("")}</div>
+  <div class="card"><h3>Jumps & plyos first</h3><p class="note">Your ${GROUP_NAME[a.group].toLowerCase()} group work, before the lift.</p>
+  <ul class="plyo">${PLYO[a.group].map(([n, d]) => `<li><strong>${n}</strong>: ${d}</li>`).join("")}</ul></div>
+  <div class="card"><h3 style="margin-bottom:.6rem">${D.title}</h3>`;
+  D.items.forEach((it, i) => {
+    const tm = it.lift ? trainingMax(a.maxes[it.lift]) : null;
+    h += `<div class="ex"><div class="ex-head"><span class="ex-name">${it.ex}</span>${it.video ? `<a class="demo" href="${it.video}" target="_blank" rel="noopener">Watch demo</a>` : ""}</div>`;
+    if (it.lift && tm == null) h += `<p class="note">No ${LIFTS[it.lift].toLowerCase()} max yet: weight shows “—”. Work up to RPE 7 and tell your coach.</p>`;
+    else if (it.lift) h += `<p class="note">Training max ${tm} lb${it.note ? ". " + it.note : ""}</p>`;
+    else if (it.note) h += `<p class="note">${it.note}</p>`;
+    it.sets.forEach(([pct, reps], s) => {
+      const w = it.lift && tm != null ? round5(tm * pct / 100) : "";
+      const logged = savedSet(it.ex, s + 1);
+      h += `<div class="set"><span class="n">${s + 1}${it.lift ? `<span class="pct">${pct}%</span>` : ""}</span>
+        <input type="number" inputmode="decimal" aria-label="${it.ex} set ${s + 1} weight in pounds" placeholder="${it.lift && tm == null ? "—" : "lb"}" value="${logged ? (logged.weight_lb ?? "") : w}" data-w="${i}-${s}">
+        <input type="number" inputmode="numeric" aria-label="${it.ex} set ${s + 1} ${it.unit || "reps"}" value="${logged ? logged.reps : reps}" data-r="${i}-${s}">
+        <button type="button" class="${logged ? "saved" : ""}" data-save="${i}-${s}">${logged ? "Saved" : "Save"}</button></div>`;
+    });
+    h += `<p class="note" style="margin-top:0">${it.lift ? "lb · reps" : it.unit === "sec" ? "lb · seconds" : "lb (optional) · reps"}</p></div>`;
+  });
+  return h + `</div>`;
+}
+
+function viewJumps() {
+  const a = me(); const lj = a.group !== "HJ", hj = a.group !== "LJ";
+  return `<h1>Jumps & speed</h1><p class="muted">Log what you did today. Your coach sees it on the Jump Board.</p>
+  ${lj ? `<div class="card"><h3>Long jump</h3><p class="note">Measured distance.</p>
+    <div class="grid3"><label>Feet<input type="number" id="ljft" inputmode="numeric" min="0" max="30"></label><label>Inches<input type="number" id="ljin" inputmode="decimal" min="0" max="11.75" step="0.25"></label><label>Approach steps<input type="number" id="ljst" inputmode="numeric" min="2" max="24"></label></div>
+    <p class="err" id="ljerr"></p><button class="btn" type="button" id="ljsave">Save jump</button></div>` : ""}
+  ${hj ? `<div class="card"><h3>High jump</h3><p class="note">Bar height, then tap each attempt: O = cleared, X = missed.</p>
+    <div class="grid2"><label>Feet<input type="number" id="hjft" inputmode="numeric" min="3" max="8"></label><label>Inches<input type="number" id="hjin" inputmode="decimal" min="0" max="11.75" step="0.25"></label></div>
+    <div class="attempts" style="margin:.7rem 0" role="group" aria-label="Attempts">${[0, 1, 2].map(i => `<button type="button" data-att="${i}" data-v="" aria-label="Attempt ${i + 1}">${i + 1}</button>`).join("")}</div>
+    <p class="err" id="hjerr"></p><button class="btn" type="button" id="hjsave">Save height</button></div>` : ""}
+  <div class="card"><h3>Plyos & sprints</h3>
+    <div class="grid2"><label>Plyo contacts<input type="number" id="contacts" inputmode="numeric" min="0" max="300"></label>
+    <label>Sprint<select id="sprintd"><option>10 m</option><option>20 m fly</option><option>30 m</option></select></label></div>
+    <label style="margin-top:.6rem">Sprint time (seconds)<input type="number" id="sprintt" inputmode="decimal" step="0.01" min="0.8" max="10"></label>
+    <p class="err" id="sperr"></p><button class="btn" type="button" id="spsave">Save</button></div>
+  <div class="card"><h3>Testing day</h3><p class="note">Only on test weeks. Leave blank what you didn’t test.</p>
+    <div class="grid2"><label>Vertical (in)<input type="number" id="t-vertical" inputmode="decimal" step="0.5"></label><label>20 m fly (sec)<input type="number" id="t-fly" inputmode="decimal" step="0.01"></label>
+    <label>Broad jump (in)<input type="number" id="t-broad" inputmode="decimal" step="0.5"></label><label>Standing triple (in)<input type="number" id="t-triple" inputmode="decimal" step="0.5"></label></div>
+    <p class="err" id="terr"></p><button class="btn" type="button" id="tsave">Save tests</button></div>`;
+}
+
+function best(id, kind) { const j = C.jumps.filter(x => x.athlete_id === id && x.kind === kind); return j.length ? Math.max(...j.map(x => Number(x.inches))) : null; }
+function bestTest(id, test) { const t = C.tests.filter(x => x.athlete_id === id && x.test === test); if (!t.length) return null; const v = t.map(x => Number(x.value)); return test === "fly" ? Math.min(...v) : Math.max(...v); }
+function viewProgress() {
+  const a = me();
+  const lifts = Object.keys(LIFTS).map(k => `<tr><td>${LIFTS[k]}</td><td>${a.maxes[k].method === "none" || !a.maxes[k].value ? "—" : a.maxes[k].method + " " + a.maxes[k].value}</td><td class="num">${trainingMax(a.maxes[k]) ?? "—"}</td></tr>`).join("");
+  const hist = C.mySets.slice(0, 10);
+  const vt = bestTest(a.id, "vertical"), fl = bestTest(a.id, "fly");
+  return `<h1>${esc(a.name.split(" ")[0])}’s progress</h1><p class="muted">Grade ${a.grade ?? "—"} · ${GROUP_NAME[a.group]}</p>
+  <h2>Maxes</h2><div class="scroll"><table><thead><tr><th>Lift</th><th>Tested</th><th class="num">Training max</th></tr></thead><tbody>${lifts}</tbody></table></div>
+  <h2>Best jumps</h2><div class="grid2">
+    <div class="card"><p class="muted" style="margin:0">Long jump</p><p style="font-family:var(--head);font-size:2rem;margin:0">${ftin(best(a.id, "LJ"))}</p></div>
+    <div class="card"><p class="muted" style="margin:0">High jump</p><p style="font-family:var(--head);font-size:2rem;margin:0">${ftin(best(a.id, "HJ"))}</p></div></div>
+  <h2>Tests</h2><div class="scroll"><table><thead><tr><th>Test</th><th class="num">Best</th></tr></thead><tbody>
+    <tr><td>Vertical</td><td class="num">${vt != null ? vt + " in" : "—"}</td></tr>
+    <tr><td>Broad jump</td><td class="num">${ftin(bestTest(a.id, "broad"))}</td></tr>
+    <tr><td>Standing triple</td><td class="num">${ftin(bestTest(a.id, "triple"))}</td></tr>
+    <tr><td>20 m fly</td><td class="num">${fl != null ? fl + " s" : "—"}</td></tr></tbody></table></div>
+  <h2>Recent sets</h2>${hist.length ? `<div class="scroll"><table><thead><tr><th>Date</th><th>Exercise</th><th class="num">Set</th><th class="num">lb × reps</th></tr></thead><tbody>${hist.map(l => `<tr><td>${l.log_date.slice(5)}</td><td>${esc(l.exercise)}</td><td class="num">${l.set_no}</td><td class="num">${l.weight_lb ?? "—"} × ${l.reps}</td></tr>`).join("")}</tbody></table></div>` : `<p class="muted">No sets yet. Save a set on the Today tab and it shows up here.</p>`}`;
+}
+
+const METRICS = {
+  squat: ["Squat training max", a => trainingMax(a.maxes.squat), v => v + " lb", false],
+  bench: ["Bench training max", a => trainingMax(a.maxes.bench), v => v + " lb", false],
+  clean: ["Clean training max", a => trainingMax(a.maxes.clean), v => v + " lb", false],
+  lj: ["Best long jump", a => best(a.id, "LJ"), ftin, false],
+  hj: ["Best high jump", a => best(a.id, "HJ"), ftin, false],
+  vertical: ["Vertical", a => bestTest(a.id, "vertical"), v => v + " in", false],
+  broad: ["Broad jump", a => bestTest(a.id, "broad"), ftin, false],
+  triple: ["Standing triple", a => bestTest(a.id, "triple"), ftin, false],
+  fly: ["20 m fly", a => bestTest(a.id, "fly"), v => v + " s", true]
+};
+function viewBoard() {
+  const [label, get, fmt, low] = METRICS[board.metric];
+  const rows = C.roster.filter(a => (board.group === "all" || a.group === board.group || (board.group !== "Both" && a.group === "Both")) && (board.grade === "all" || String(a.grade) === board.grade))
+    .map(a => ({ a, v: get(a) })).filter(r => r.v != null).sort((x, y) => low ? x.v - y.v : y.v - x.v);
+  return `<h1>Leaderboard</h1>
+  <div class="grid3" style="margin:.8rem 0 1rem">
+    <label>Ranking<select id="bm">${Object.entries(METRICS).map(([k, m]) => `<option value="${k}" ${k === board.metric ? "selected" : ""}>${m[0]}</option>`).join("")}</select></label>
+    <label>Group<select id="bg">${[["all", "Everyone"], ["LJ", "Long Jump"], ["HJ", "High Jump"], ["Both", "Both only"]].map(([k, l]) => `<option value="${k}" ${k === board.group ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+    <label>Grade<select id="bgr">${["all", "9", "10", "11", "12"].map(k => `<option value="${k}" ${k === board.grade ? "selected" : ""}>${k === "all" ? "All" : k}</option>`).join("")}</select></label></div>
+  ${rows.length ? `<div class="scroll"><table><thead><tr><th></th><th>Athlete</th><th>Group</th><th class="num">${label}</th></tr></thead><tbody>${rows.map((r, i) => `<tr><td class="rank">${i + 1}</td><td>${esc(r.a.name)}</td><td>${GROUP_NAME[r.a.group]}</td><td class="num">${fmt(r.v)}</td></tr>`).join("")}</tbody></table></div>` : `<p class="muted">Nobody in this filter has a result yet.</p>`}`;
+}
+
+function coachSignIn() {
+  return `<h1>Coach sign-in</h1><p class="muted">Use the coach email and password set up in Supabase.</p>
+  <div class="card coach-form"><label>Email<input type="email" id="cemail" autocomplete="username"></label>
+  <label>Password<input type="password" id="cpass" autocomplete="current-password"></label>
+  <p class="err" id="cerr"></p><button class="btn big" type="button" id="csignin">Sign in</button></div>`;
+}
+function viewCoach() {
+  const days = [0, -1, -2, -3, -4, -5, -6].map(o => today(o));
+  const s = C.settings;
+  return `<div class="row spread"><h1>Coach view</h1><div class="row"><span class="muted small">${refreshedAt ? "Updated " + refreshedAt : ""}</span><button class="btn ghost" type="button" id="refresh">Refresh</button><button class="btn ghost" type="button" id="csignout">Sign out</button></div></div>
+  <p class="muted">Current week <input type="number" id="week" min="1" max="20" value="${s.week}" style="width:4.5rem;display:inline-block" aria-label="Current week"></p>
+  <details class="card" open><summary>Attendance</summary><p class="note">One check-in per athlete per day. Today first.</p><div class="scroll"><table><thead><tr><th>Athlete</th>${days.map(d => `<th class="num">${d.slice(5)}</th>`).join("")}<th class="num">7-day</th></tr></thead><tbody>
+    ${C.roster.map(a => { const n = days.filter(d => C.checkins.some(c => c.athlete_id === a.id && c.check_date === d)); return `<tr><td>${esc(a.name)}</td>${days.map(d => `<td class="num">${n.includes(d) ? "✓" : ""}</td>`).join("")}<td class="num">${n.length}/7</td></tr>`; }).join("")}</tbody></table></div>
+    <p class="note">Today: ${C.roster.filter(a => checkedToday(a.id)).length} of ${C.roster.length} checked in. Full history is in Supabase, table jl_checkins.</p></details>
+  <details class="card"><summary>Team weights</summary><p class="note">Training max per lift (est. 1RM × 0.90, rounded to 5 lb).</p>
+    <div class="scroll"><table><thead><tr><th>Athlete</th><th>Group</th>${Object.values(LIFTS).map(l => `<th class="num">${l}</th>`).join("")}</tr></thead><tbody>
+    ${C.roster.map(a => `<tr><td>${esc(a.name)}</td><td>${GROUP_NAME[a.group]}</td>${Object.keys(LIFTS).map(k => `<td class="num">${trainingMax(a.maxes[k]) ?? "—"}</td>`).join("")}</tr>`).join("")}</tbody></table></div></details>
+  <details class="card"><summary>Maxes</summary><p class="note">Enter test results. Training maxes and every athlete’s set weights update automatically.</p>
+    <div class="scroll"><table><thead><tr><th>Athlete</th>${Object.values(LIFTS).map(l => `<th>${l}</th>`).join("")}</tr></thead><tbody>
+    ${C.roster.map(a => `<tr><td>${esc(a.name)}</td>${Object.keys(LIFTS).map(k => `<td><div class="row" style="flex-wrap:nowrap;gap:.3rem"><select data-mm="${a.id}|${k}" style="width:5.2rem" aria-label="${esc(a.name)} ${LIFTS[k]} test type">${["3RM", "5RM", "1RM", "none"].map(o => `<option ${a.maxes[k].method === o ? "selected" : ""}>${o}</option>`).join("")}</select><input type="number" data-mv="${a.id}|${k}" value="${a.maxes[k].value || ""}" style="width:4.8rem" aria-label="${esc(a.name)} ${LIFTS[k]} pounds"></div></td>`).join("")}</tr>`).join("")}</tbody></table></div></details>
+  <details class="card"><summary>Jump board</summary><div class="scroll"><table><thead><tr><th>Athlete</th><th>Group</th><th class="num">Best LJ</th><th class="num">Best HJ</th><th class="num">Last jump</th></tr></thead><tbody>
+    ${C.roster.map(a => { const j = C.jumps.filter(x => x.athlete_id === a.id).sort((x, y) => y.jump_date.localeCompare(x.jump_date))[0]; return `<tr><td>${esc(a.name)}</td><td>${GROUP_NAME[a.group]}</td><td class="num">${ftin(best(a.id, "LJ"))}</td><td class="num">${ftin(best(a.id, "HJ"))}</td><td class="num">${j ? j.jump_date.slice(5) : "—"}</td></tr>`; }).join("")}</tbody></table></div></details>
+  <details class="card" ${C.roster.length ? "" : "open"}><summary>Roster</summary><p class="note">Event group decides which jump workout an athlete sees. Duplicate names are blocked; use a last initial to tell athletes apart.</p>
+    ${C.roster.length ? `<div class="scroll"><table><thead><tr><th>Athlete</th><th>Grade</th><th>Event group</th><th></th></tr></thead><tbody>
+    ${C.roster.map(a => `<tr><td>${esc(a.name)}</td><td>${a.grade ?? "—"}</td><td><select data-grp="${a.id}" aria-label="${esc(a.name)} event group">${Object.entries(GROUP_NAME).map(([k, l]) => `<option value="${k}" ${a.group === k ? "selected" : ""}>${l}</option>`).join("")}</select></td><td><button class="btn ghost small" type="button" data-hide="${a.id}">Remove</button></td></tr>`).join("")}</tbody></table></div>` : ""}
+    <div class="grid3"><label>Name<input id="nn" autocomplete="off"></label><label>Grade<select id="ng">${[9, 10, 11, 12].map(g => `<option>${g}</option>`).join("")}</select></label><label>Group<select id="ngr">${Object.entries(GROUP_NAME).map(([k, l]) => `<option value="${k}">${l}</option>`).join("")}</select></label></div>
+    <p class="err" id="nerr"></p><button class="btn" type="button" id="nadd">Add athlete</button>
+    <p class="note" style="margin-top:.8rem">Remove hides an athlete from the app but keeps their logged data in Supabase.</p></details>
+  <details class="card"><summary>Warm-up & rules</summary>
+    <p><strong>Warm-up (10 min):</strong> jog or skips, leg swings, walking lunges with reach, glute bridges, A-skips, 2 light sets of the first lift.</p>
+    <ul><li>Plyos before lifting, on grass, turf or runway.</li><li>Spotter on every squat and bench set.</li><li>Pain that changes how you move: stop and see the trainer.</li><li>Check in every day you lift.</li></ul></details>
+  <details class="card"><summary>Team look & home screen icon</summary>
+    <div class="grid2"><label>App name<input id="tapp" value="${esc(s.app_name)}"></label><label>School<input id="tschool" value="${esc(s.school)}"></label>
+    <label>Mascot<input id="tmascot" value="${esc(s.mascot)}"></label><span></span>
+    <div class="swatch"><label for="tp">Main color (buttons, tabs)</label><input type="color" id="tp" value="${s.primary_color}"></div>
+    <div class="swatch"><label for="ta">Header color</label><input type="color" id="ta" value="${s.accent_color}"></div></div>
+    <p class="note" style="margin-top:.8rem">Changes save for everyone. Add to Home Screen: on iPhone, Share → Add to Home Screen; on Android, ⋮ → Add to Home screen.</p></details>`;
+}
+
+// ---------- actions ----------
+const val = id => (document.getElementById(id) || {}).value || "";
+const err = (id, m) => { const e = document.getElementById(id); if (e) e.textContent = m; };
+const failed = (e) => { console.warn(e); toast("Didn’t save. Check your connection and try again."); };
+
+document.addEventListener("click", async e => {
+  const t = e.target.closest("button"); if (!t) return;
+  if (t.dataset.tab) return go(t.dataset.tab);
+  if (t.id === "who") { myId = null; LS.set("jl-me", null); C.mySets = []; go("today"); return; }
+  if (t.id === "codego") {
+    const c = val("code").trim(); if (!c) return err("codeerr", "Enter the team code.");
+    t.disabled = true; code = c; makeClient(); codeOk = await checkCode(); t.disabled = false;
+    if (!codeOk) { err("codeerr", "That code didn’t work. Check with your coach."); return; }
+    LS.set("jl-team-code", code); await refresh(); render(); return;
+  }
+  if (t.dataset.pick) { myId = t.dataset.pick; LS.set("jl-me", myId); await refresh(); render(); toast("Welcome, " + me().name.split(" ")[0]); return; }
+  if (t.id === "checkin") {
+    const a = me(); t.disabled = true;
+    const { error } = await db.from("jl_checkins").insert({ athlete_id: a.id, check_date: today(), week: C.settings.week, day, event_group: a.group });
+    if (error && error.code !== "23505") { t.disabled = false; return failed(error); }
+    C.checkins.push({ athlete_id: a.id, check_date: today() }); render(); toast(error ? "Already checked in today" : "Checked in"); return;
+  }
+  if (t.dataset.day) { day = t.dataset.day; LS.set("jl-day", day); render(); return; }
+  if (t.dataset.save) {
+    const [i, s] = t.dataset.save.split("-").map(Number); const it = DAYS[day].items[i];
+    const w = document.querySelector(`[data-w="${i}-${s}"]`).value, r = document.querySelector(`[data-r="${i}-${s}"]`).value;
+    if (!r) { toast("Enter reps first"); return; }
+    t.disabled = true; t.textContent = "…";
+    const row = { athlete_id: myId, log_date: today(), week: C.settings.week, day, exercise: it.ex, set_no: s + 1, weight_lb: w ? Number(w) : null, reps: Number(r) };
+    const { error } = await db.from("jl_sets").upsert(row, { onConflict: "athlete_id,log_date,exercise,set_no" });
+    t.disabled = false;
+    if (error) { t.textContent = "Save"; return failed(error); }
+    C.mySets = C.mySets.filter(l => !(l.log_date === row.log_date && l.exercise === row.exercise && l.set_no === row.set_no)); C.mySets.unshift(row);
+    t.classList.add("saved"); t.textContent = "Saved"; return;
+  }
+  if (t.dataset.att != null) { const order = ["", "O", "X"]; t.dataset.v = order[(order.indexOf(t.dataset.v) + 1) % 3]; t.textContent = t.dataset.v || Number(t.dataset.att) + 1; return; }
+  if (t.id === "ljsave") {
+    if (!val("ljft")) return err("ljerr", "Enter the feet.");
+    const ft = Number(val("ljft")), inch = Number(val("ljin") || 0);
+    const row = { athlete_id: myId, jump_date: today(), kind: "LJ", inches: ft * 12 + inch, approach_steps: Number(val("ljst")) || null };
+    t.disabled = true; const { error } = await db.from("jl_jumps").insert(row); t.disabled = false;
+    if (error) return failed(error);
+    C.jumps.push(row); render(); toast("Jump saved: " + ft + "′ " + inch + "″"); return;
+  }
+  if (t.id === "hjsave") {
+    if (!val("hjft")) return err("hjerr", "Enter the bar height.");
+    const att = [...document.querySelectorAll("[data-att]")].map(b => b.dataset.v).join("");
+    if (!att) return err("hjerr", "Tap at least one attempt.");
+    if (!att.includes("O")) { render(); toast("Misses noted. Only cleared heights are saved."); return; }
+    const row = { athlete_id: myId, jump_date: today(), kind: "HJ", inches: Number(val("hjft")) * 12 + Number(val("hjin") || 0), attempts: att };
+    t.disabled = true; const { error } = await db.from("jl_jumps").insert(row); t.disabled = false;
+    if (error) return failed(error);
+    C.jumps.push(row); render(); toast("Height saved"); return;
+  }
+  if (t.id === "spsave") {
+    if (!val("contacts") && !val("sprintt")) return err("sperr", "Enter contacts or a sprint time.");
+    t.disabled = true;
+    const { error } = await db.from("jl_speed").insert({ athlete_id: myId, log_date: today(), contacts: val("contacts") ? Number(val("contacts")) : null, sprint: val("sprintt") ? val("sprintd") : null, seconds: val("sprintt") ? Number(val("sprintt")) : null });
+    t.disabled = false; if (error) return failed(error);
+    render(); toast("Saved"); return;
+  }
+  if (t.id === "tsave") {
+    const rows = ["vertical", "fly", "broad", "triple"].filter(k => val("t-" + k)).map(k => ({ athlete_id: myId, test_date: today(), test: k, value: Number(val("t-" + k)) }));
+    if (!rows.length) return err("terr", "Enter at least one test result.");
+    t.disabled = true; const { error } = await db.from("jl_tests").insert(rows); t.disabled = false;
+    if (error) return failed(error);
+    C.tests.push(...rows); render(); toast(rows.length + " test" + (rows.length > 1 ? "s" : "") + " saved"); return;
+  }
+  if (t.id === "refresh") { t.disabled = true; await loadSettings(); await refresh(); render(); toast("Updated"); return; }
+  if (t.id === "csignin") {
+    const email = val("cemail").trim(), password = val("cpass");
+    if (!email || !password) return err("cerr", "Enter your email and password.");
+    t.disabled = true;
+    const { error } = await db.auth.signInWithPassword({ email, password });
+    if (error) { t.disabled = false; return err("cerr", "Sign-in failed. Check the email and password."); }
+    isCoach = await checkCoach();
+    if (!isCoach) { await db.auth.signOut(); t.disabled = false; return err("cerr", "This account isn’t on the coach list in Supabase."); }
+    await refresh(); render(); toast("Signed in as coach"); return;
+  }
+  if (t.id === "csignout") { await db.auth.signOut(); isCoach = false; if (!codeOk) { C.roster = []; } render(); toast("Signed out"); return; }
+  if (t.id === "nadd") {
+    const name = val("nn").trim().replace(/\s+/g, " ");
+    if (!name) return err("nerr", "Enter a name.");
+    if (C.roster.some(a => a.name.toLowerCase() === name.toLowerCase())) return err("nerr", name + " is already on the roster. Add a last initial to tell them apart.");
+    t.disabled = true;
+    const { data, error } = await db.from("jl_roster").insert({ name, grade: Number(val("ng")), event_group: val("ngr") }).select().single();
+    t.disabled = false;
+    if (error) return err("nerr", error.code === "23505" ? name + " is already in Supabase (maybe removed earlier). Turn them back on in jl_roster, or use a different name." : "Didn’t save. Try again.");
+    C.roster.push(toAthlete(data)); C.roster.sort((a, b) => a.name.localeCompare(b.name)); render(); toast(name + " added"); return;
+  }
+  if (t.dataset.hide) {
+    const a = C.roster.find(x => x.id === t.dataset.hide);
+    if (!confirm("Remove " + a.name + " from the app? Their logged data stays in Supabase.")) return;
+    const { error } = await db.from("jl_roster").update({ active: false }).eq("id", a.id);
+    if (error) return failed(error);
+    C.roster = C.roster.filter(x => x.id !== a.id); render(); toast(a.name + " removed"); return;
+  }
+});
+
+const TEAM_FIELDS = { tapp: "app_name", tschool: "school", tmascot: "mascot", tp: "primary_color", ta: "accent_color" };
+document.addEventListener("input", e => {
+  const t = e.target;
+  if (t.id === "find") { document.getElementById("names").innerHTML = namesList(t.value); return; }
+  if (TEAM_FIELDS[t.id]) { C.settings[TEAM_FIELDS[t.id]] = t.value; applyTeam(); }
+});
+document.addEventListener("change", async e => {
+  const t = e.target;
+  if (TEAM_FIELDS[t.id] || t.id === "week") {
+    if (t.id === "week") C.settings.week = Number(t.value) || 1;
+    const s = C.settings;
+    const { error } = await db.from("jl_settings").update({ app_name: s.app_name, school: s.school, mascot: s.mascot, primary_color: s.primary_color, accent_color: s.accent_color, week: s.week }).eq("id", 1);
+    return error ? failed(error) : toast("Saved for everyone");
+  }
+  if (t.dataset.mm || t.dataset.mv) {
+    const [id, k] = (t.dataset.mm || t.dataset.mv).split("|"); const a = C.roster.find(x => x.id === id);
+    if (t.dataset.mm) a.maxes[k].method = t.value;
+    else { a.maxes[k].value = Number(t.value) || 0; if (a.maxes[k].value && a.maxes[k].method === "none") { a.maxes[k].method = "3RM"; const sel = document.querySelector(`[data-mm="${id}|${k}"]`); if (sel) sel.value = "3RM"; } }
+    const { error } = await db.from("jl_roster").update({ [k + "_test"]: a.maxes[k].method, [k + "_lb"]: a.maxes[k].value || null }).eq("id", id);
+    return error ? failed(error) : toast("Saved: training max " + (trainingMax(a.maxes[k]) ?? "—"));
+  }
+  if (t.dataset.grp) {
+    const a = C.roster.find(x => x.id === t.dataset.grp); a.group = t.value;
+    const { error } = await db.from("jl_roster").update({ event_group: t.value }).eq("id", a.id);
+    return error ? failed(error) : toast("Group updated");
+  }
+  if (t.id === "bm" || t.id === "bg" || t.id === "bgr") { board = { metric: val("bm"), group: val("bg"), grade: val("bgr") }; render(); }
+});
+
+// ---------- start ----------
+async function boot() {
+  render();
   if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) return;
   try {
-    await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js");
+    if (!window.supabase) await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js");
+    makeClient();
+    isCoach = await checkCoach();
+    await loadSettings();
+    codeOk = await checkCode();
+    if (code && !codeOk) LS.set("jl-team-code", null);
+    await refresh();
   } catch (e) {
-    console.warn("Couldn't load Supabase; showing the built-in workouts.", e);
-    return;
+    console.warn(e); loadError = "Couldn’t reach the app’s database. Check your connection and refresh.";
   }
-  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-
-  const { data, error } = await db.from("exercises").select("*").order("sort_order");
-  let rows = STATIC_EXERCISES;
-  if (error) console.warn("Couldn't read exercises; showing the built-in workouts.", error);
-  else if (data && data.length) { rows = data; render(rows); }
-
-  // Turn on the lift log
-  fillExerciseMenu(rows);
-  document.getElementById("log").hidden = false;
-  document.getElementById("nav-log").hidden = false;
-  const form = document.getElementById("log-form");
-  const status = document.getElementById("status");
-  form.lift_date.valueAsDate = new Date(Date.now() - new Date().getTimezoneOffset() * 60000);
-
-  form.addEventListener("submit", async ev => {
-    ev.preventDefault();
-    status.className = ""; status.textContent = "";
-    const f = form.elements;
-    if (!f.initials.value.trim() || !f.exercise.value || !f.reps.value || !f.team_code.value.trim()) {
-      status.className = "bad";
-      status.textContent = "Fill in initials, exercise, reps and team code.";
-      return;
-    }
-    const btn = form.querySelector("button");
-    btn.disabled = true; btn.textContent = "Saving…";
-    const { error } = await db.from("lift_logs").insert({
-      initials: f.initials.value.trim().toUpperCase(),
-      lift_date: f.lift_date.value,
-      exercise: f.exercise.value,
-      weight_lb: f.weight_lb.value ? Number(f.weight_lb.value) : null,
-      reps: Number(f.reps.value),
-      team_code: f.team_code.value.trim()
-    });
-    btn.disabled = false; btn.textContent = "Save lift";
-    if (error) {
-      status.className = "bad";
-      status.textContent = "Lift not saved. Check the team code and try again.";
-      console.warn(error);
-    } else {
-      status.className = "ok";
-      status.textContent = "Lift saved.";
-      f.weight_lb.value = ""; f.reps.value = "";
-    }
-  });
+  loaded = true; render();
 }
-
-render(STATIC_EXERCISES);
-connectSupabase();
+boot();
 </script>
 </body>
 </html>
